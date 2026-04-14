@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mazā Mula – Atklāj attēlu</title>
+  <script src="../mula-engine.js"></script>
+</head>
+<body>
+  <div id="game"></div>
+  <script>
+    // REVEAL IMAGE — click on invisible spots on the background to reveal hidden images.
+    // Each object's image should ideally be the same size as its {w, h} box so it fits
+    // perfectly — the engine scales everything proportionally with the background.
+    MulaEngine.init('#game', {
+      type: 'reveal-image',
+      image: 'assets/img/KlusaDaba/Lancmanis_Klusa_daba.jpg',
+      imageSize: { width: 934, height: 768 },
+      objects: [
+        { x: 80,  y: 120, w: 130, h: 180, image: 'assets/img/box_01.png' },
+        { x: 310, y: 250, w: 100, h: 140, image: 'assets/img/box_02.png' },
+        { x: 500, y: 100, w: 140, h: 120, image: 'assets/img/box_03.png' },
+        { x: 650, y: 300, w: 120, h: 160, image: 'assets/img/box_04.png' }
+      ],
+      // debug: true,      // show spot outlines while positioning
+      // revealOnce: false, // allow toggling (click again to hide)
+      taskText: 'Uzklikšķini uz gleznas, lai atklātu paslēptos attēlus!',
+      pdfUrl: 'assets/pdf/KlusaDaba/2/2_1_Enas_dabu_gaisma_rada.pdf',
+      mulaAssetsPath: '../mula-assets/',
+      caption: 'Imants Lancmanis. Klusā daba – atklāj detaļas'
+    });
+  </script>
+</body>
+</html>

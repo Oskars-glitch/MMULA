@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mazā Mula – 3D Modelis ar tekstūrām</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="../mula-engine.js"></script>
+</head>
+<body>
+  <div id="game"></div>
+  <script>
+    // 3D VIEWER with clickable texture previews.
+    // - objUrl is loaded once.
+    // - Each entry in `textures` is a preview image + the MTL file to apply when clicked.
+    // - Only the material swaps; geometry stays in place. Fast.
+    MulaEngine.init('#game', {
+      type: 'obj-viewer',
+      objUrl: 'assets/obj/granita/granita.obj',
+      mtlUrl: 'assets/obj/granita/GRANITS.mtl',   // initial material
+      bgColor: 0xF4EDDF,
+      textures: [
+        { thumb: 'assets/obj/granita/GRANITS.png', mtlUrl: 'assets/obj/granita/GRANITS.mtl',  label: 'Granīts' },
+        { thumb: 'assets/obj/granita/BRONZA.png',  mtlUrl: 'assets/obj/granita/BRONZA.mtl',   label: 'Bronza' },
+        { thumb: 'assets/obj/granita/MARMORS.png',  mtlUrl: 'assets/obj/granita/MARMORS.mtl',   label: 'Marmors' },
+        { thumb: 'assets/obj/granita/MARMORS2.png',    mtlUrl: 'assets/obj/granita/MARMORS2.mtl',     label: 'Koks' }
+      ],
+      taskText: 'Pagrozi modeli un izmēģini dažādas tekstūras!',
+      mulaAssetsPath: '../mula-assets/',
+      caption: 'Granīta skulptūra – izvēlies materiālu'
+    });
+  </script>
+</body>
+</html>

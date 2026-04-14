@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mazā Mula – Atrodi atšķirības</title>
+  <script src="../mula-engine.js"></script>
+</head>
+<body>
+  <div id="game"></div>
+  <script>
+    MulaEngine.init('#game', {
+      type: 'find-objects',
+      image: 'assets/img/KlusaDaba/Lancmanis_Klusa_daba.jpg',
+      imageSize: { width: 934, height: 768 },
+      objects: [
+        { x: 80,  y: 120, w: 130, h: 180, alpha: 30, alphaDebug: 0, fill: 0, label: 'Atšķirība 1' },
+        { x: 310, y: 250, w: 100, h: 140, alpha: 30, label: 'Atšķirība 2' },
+        { x: 500, y: 100, w: 140, h: 120, alpha: 30, label: 'Atšķirība 3' },
+        { x: 650, y: 300, w: 120, h: 160, alpha: 30, label: 'Atšķirība 4' }
+      ],
+      taskText: 'Atrodi 4 lietas.',
+      pdfUrl: 'assets/pdf/KlusaDaba/2/2_1_Enas_dabu_gaisma_rada.pdf',
+      mulaAssetsPath: '../mula-assets/',
+      caption: 'Imants Lancmanis. Klusā daba ar ēnām un gaismu',
+    });
+  </script>
+</body>
+</html>

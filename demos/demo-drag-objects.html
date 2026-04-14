@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mazā Mula – Pabeig gleznu</title>
+  <script src="../mula-engine.js"></script>
+</head>
+<body>
+  <div id="game"></div>
+  <script>
+    // Objects: just src — original PNG size is preserved when placed
+    // Free placement anywhere on the painting with layer controls (↑↓🗑)
+    MulaEngine.init('#game', {
+      type: 'drag-objects',
+      backgroundImage: 'assets/img/KlusaDaba/Lancmanis/2/Lancmanis_Klusa_daba_bez_3_bundzam.png',
+      originalImage: 'assets/img/KlusaDaba/Lancmanis_Klusa_daba.jpg',
+      objects: [
+        { src: 'assets/img/KlusaDaba/Lancmanis/2/4.png' },
+        { src: 'assets/img/KlusaDaba/Lancmanis/2/6.png' },
+        { src: 'assets/img/KlusaDaba/Lancmanis/2/7.png' }
+      ],
+      taskText: 'Novieto priekšmetus uz gleznas! Izmanto bultiņas, lai mainītu slāņu secību.',
+      pdfUrl: 'assets/pdf/KlusaDaba/2/2_1_Enas_dabu_gaisma_rada.pdf',
+      mulaAssetsPath: '../mula-assets/',
+      caption: 'Imants Lancmanis. Klusā daba'
+    });
+  </script>
+</body>
+</html>

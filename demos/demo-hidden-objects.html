@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mazā Mula – Prožektors</title>
+  <script src="../mula-engine.js"></script>
+</head>
+<body>
+  <div id="game"></div>
+  <script>
+    // HIDDEN OBJECTS (SPOTLIGHT)
+    // The 'image' is what the user sees. The 'hiddenImage' is invisible
+    // except inside a circle around the cursor (the "flashlight").
+    // hiddenImage should be the SAME SIZE as image so overlays align.
+    //
+    // Optional: add 'objects' with {x,y,w,h} to turn it into a
+    // find-the-hidden-thing game — each click inside a spot counts as found.
+    MulaEngine.init('#game', {
+      type: 'hidden-objects',
+      image: 'assets/img/KlusaDaba/Lancmanis_Klusa_daba.jpg',
+      hiddenImage: 'assets/img/KlusaDaba/Lancmanis_Klusa_daba_hidden.jpg',
+      imageSize: { width: 934, height: 768 },
+      radius: 110,       // spotlight radius in px
+      feather: 25,       // soft edge width in px
+      ringWidth: 3,
+      ringColor: '#2196F3',
+      // hideCursor: false, // uncomment to keep the OS cursor visible
+
+      // Optional clickable find-areas (coords in imageSize space)
+      objects: [
+        { x: 80,  y: 120, w: 130, h: 180, label: 'Ābols' },
+        { x: 310, y: 250, w: 100, h: 140, label: 'Bundža' },
+        { x: 500, y: 100, w: 140, h: 120, label: 'Grāmata' },
+        { x: 650, y: 300, w: 120, h: 160, label: 'Svečturis' }
+      ],
+      // debug: true, // show area borders while positioning
+
+      taskText: 'Izgaismo gleznu ar prožektoru un atrodi 4 paslēptos priekšmetus!',
+      pdfUrl: 'assets/pdf/KlusaDaba/2/2_1_Enas_dabu_gaisma_rada.pdf',
+      mulaAssetsPath: '../mula-assets/',
+      caption: 'Imants Lancmanis. Klusā daba – prožektors'
+    });
+  </script>
+</body>
+</html>

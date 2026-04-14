@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mazā Mula – Atrodi atšķirības</title>
+  <script src="../mula-engine.js"></script>
+</head>
+<body>
+  <div id="game"></div>
+  <script>
+    // TWO IMAGES MODE — separate objects per image
+    MulaEngine.init('#game', {
+      type: 'find-objects',
+      imageLeft: 'assets/img/KlusaDaba/Lancmanis_Klusa_daba.jpg',
+      imageRight: 'assets/img/KlusaDaba/Lancmanis/2/Lancmanis_Klusa_daba_bez_3_bundzam.png',
+      imageSize: { width: 934, height: 768 },
+      // objectsLeft/objectsRight — areas per image (coordinates can differ)
+      objectsLeft: [
+        { x: 80,  y: 120, w: 130, h: 180, alpha: 30 },
+        { x: 310, y: 250, w: 100, h: 140, alpha: 30 },
+        { x: 500, y: 100, w: 140, h: 120, alpha: 30 },
+        { x: 650, y: 300, w: 120, h: 160, alpha: 30 }
+      ],
+      objectsRight: [
+        { x: 80,  y: 120, w: 130, h: 180, alpha: 30 },
+        { x: 310, y: 250, w: 100, h: 140, alpha: 30 },
+        { x: 500, y: 100, w: 140, h: 120, alpha: 30 },
+        { x: 650, y: 300, w: 120, h: 160, alpha: 30 }
+      ],
+      // color: '#e6381b',  // custom highlight color (hex)
+      // fill: true,        // fill found areas (default true)
+      // debug: true,       // show area borders while developing
+      taskText: 'Atrodi atšķirības starp abām gleznām! Uzklikšķini uz tām.',
+      pdfUrl: 'assets/pdf/KlusaDaba/2/2_1_Enas_dabu_gaisma_rada.pdf',
+      mulaAssetsPath: '../mula-assets/',
+      captionLeft: 'Imants Lancmanis. Klusā daba ar ēnām un gaismu',
+      captionRight: 'Imants Lancmanis. Klusā daba bez 3 bundžām'
+    });
+
+    // SINGLE IMAGE MODE example (uncomment to test):
+    // MulaEngine.init('#game', {
+    //   type: 'find-objects',
+    //   image: 'assets/img/KlusaDaba/Lancmanis_Klusa_daba.jpg',
+    //   imageSize: { width: 934, height: 768 },
+    //   objects: [
+    //     { x: 80,  y: 120, w: 130, h: 180, alpha: 30 },
+    //     { x: 310, y: 250, w: 100, h: 140, alpha: 30 },
+    //     { x: 500, y: 100, w: 140, h: 120, alpha: 30 }
+    //   ],
+    //   debug: true,
+    //   caption: 'Imants Lancmanis. Klusā daba',
+    //   taskText: 'Atrodi 3 objektus gleznā!',
+    //   mulaAssetsPath: '../mula-assets/'
+    // });
+  </script>
+</body>
+</html>
