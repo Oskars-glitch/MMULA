@@ -278,29 +278,36 @@ data/                             # Game configuration data (SVG data)
 
 ## Usage Example
 
-```html
-<!DOCTYPE html>
-<html>
+```<!DOCTYPE html>
+<html lang="lv">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mula Game</title>
+  <title>Mazā Mula – Atklāj attēlu</title>
+  <script src="https://cdn.jsdelivr.net/gh/Oskars-glitch/MMULA@main/mula-engine.js"></script>
 </head>
 <body>
   <div id="game"></div>
-  
-  <script src="mula-engine.js"></script>
   <script>
+    // REVEAL IMAGE — click on invisible spots on the background to reveal hidden images.
+    // Each object's image should ideally be the same size as its {w, h} box so it fits
+    // perfectly — the engine scales everything proportionally with the background.
     MulaEngine.init('#game', {
-      type: 'find-objects',
-      image: 'assets/landscape.jpg',
-      imageSize: { width: 1920, height: 1440 },
+      type: 'reveal-image',
+      image: 'assets/img/KlusaDaba/Lancmanis_Klusa_daba.jpg',
+      imageSize: { width: 934, height: 768 },
       objects: [
-        { x: 450, y: 300, w: 120, h: 150 },
-        { x: 900, y: 600, w: 100, h: 100 }
+        { x: 80,  y: 120, w: 130, h: 180, image: 'assets/img/box_01.png' },
+        { x: 310, y: 250, w: 100, h: 140, image: 'assets/img/box_02.png' },
+        { x: 500, y: 100, w: 140, h: 120, image: 'assets/img/box_03.png' },
+        { x: 650, y: 300, w: 120, h: 160, image: 'assets/img/box_04.png' }
       ],
-      taskText: 'Find the hidden objects in the landscape',
-      mulaAssetsPath: 'mula-assets/'
+      // debug: true,      // show spot outlines while positioning
+      // revealOnce: false, // allow toggling (click again to hide)
+      taskText: 'Uzklikšķini uz gleznas, lai atklātu paslēptos attēlus!',
+      pdfUrl: 'assets/pdf/KlusaDaba/2/2_1_Enas_dabu_gaisma_rada.pdf',
+      mulaAssetsPath: '../mula-assets/',
+      caption: 'Imants Lancmanis. Klusā daba – atklāj detaļas'
     });
   </script>
 </body>
@@ -311,16 +318,12 @@ data/                             # Game configuration data (SVG data)
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.4.0 | 2025 | Spotlight game, enhanced 3D viewer, layer controls, improved mobile support |
-| 1.3.0 | 2024 | Reveal-image game type, debug mode, enhanced styling |
-| 1.2.0 | 2024 | Drag-objects game, PDF viewer, info bar improvements |
-| 1.1.0 | 2023 | 3D viewer with texture swapping |
-| 1.0.0 | 2023 | Initial release with find-objects game |
+| 1.4.0 | 2026 | Spotlight game, enhanced 3D viewer, layer controls, improved mobile support |
+| 1.3.0 | 2026 | Reveal-image game type, debug mode, enhanced styling |
+| 1.2.0 | 2026 | Drag-objects game, PDF viewer, info bar improvements |
+| 1.1.0 | 2026 | 3D viewer with texture swapping |
+| 1.0.0 | 2026 | Initial release with find-objects game |
 
 ## License
 
 Part of the Mazā Mula educational platform for art and cultural heritage learning.
-
-## Support
-
-For issues or questions about game setup and configuration, refer to demo files for implementation examples.
