@@ -175,6 +175,36 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 .mula-hidden-spot.debug { border: 2px dashed rgba(230,56,27,0.6); background: rgba(230,56,27,0.15); }
 .mula-hidden-spot.found { background: rgba(230,56,27,0.25); border: 2px solid #e6381b; }
 
+/* === CLICK-THROUGH GAME === */
+.mula-click-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1vh; }
+.mula-click-stage { position: relative; display: inline-block; max-width: 95vw; max-height: 80vh; }
+.mula-click-bg { max-width: 95vw; max-height: 80vh; display: block; user-select: none; -webkit-user-drag: none; }
+.mula-click-spot { position: absolute; cursor: pointer; }
+.mula-click-spot.debug { border: 2px dashed rgba(230,56,27,0.6); background: rgba(230,56,27,0.15); border-radius: 4px; }
+.mula-click-spot img { width: 100%; height: 100%; display: block; pointer-events: none; user-select: none; -webkit-user-drag: none; }
+
+/* === TIMED-PREVIEW GAME === */
+.mula-timed-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1vh; }
+.mula-timed-toolbar { display: flex; justify-content: center; padding: 0.5rem 0; }
+.mula-timed-btn {
+  padding: 0.5rem 1.5rem; background: #e6381b; color: #fff; border: none;
+  border-radius: 4px; cursor: pointer; font-size: 0.95rem; font-weight: 600;
+}
+.mula-timed-btn:hover { background: #c42f17; }
+.mula-timed-btn:disabled { background: #aaa; cursor: not-allowed; }
+.mula-timed-overlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.85); z-index: 9000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.mula-timed-overlay-img { max-width: 90vw; max-height: 80vh; display: block; }
+.mula-timed-countdown {
+  position: absolute; top: 20px; right: 30px;
+  width: 60px; height: 60px; border-radius: 50%; background: #e6381b;
+  color: #fff; font-size: 2rem; font-weight: bold;
+  display: flex; align-items: center; justify-content: center;
+}
+
 /* === PDF VIEWER OVERLAY === */
 .mula-pdf-overlay {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -1073,6 +1103,225 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
   }
 
   // ============================================================
+  // GAME: CLICK-THROUGH
+  // Clickable hotspots on a background. Each click cycles to the next
+  // image in that spot's `images` array. Useful for "try variants"
+  // style exercises (e.g., repaint the same vase with different colors).
+  //
+  // Config:
+  //   type: 'click-through'
+  //   image: URL of background image
+  //   imageSize: { width, height } — natural px coordinate system
+  //   objects: [{
+  //     x, y, w, h,
+  //     images: [url, url, url, ...],  // cycles on each click
+  //     startIndex: 0,                  // optional, initial shown image (default 0 = first)
+  //     loop: true                      // optional, wrap around (default true)
+  //   }]
+  //   caption, taskText, pdfUrl, debug
+  // ============================================================
+  function initClickThrough(container, config) {
+    var iSize = config.imageSize || { width: 800, height: 600 };
+    var objs = config.objects || [];
+    var debug = !!config.debug;
+
+    var wrapper = el('div', { class: 'mula-click-wrapper' });
+    var stage = el('div', { class: 'mula-click-stage' });
+    var bgImg = el('img', { class: 'mula-click-bg', src: config.image, draggable: 'false' });
+    stage.appendChild(bgImg);
+    wrapper.appendChild(stage);
+    if (config.caption) wrapper.appendChild(el('div', { class: 'mula-caption' }, config.caption));
+    container.appendChild(wrapper);
+
+    var spots = [];
+
+    function layoutSpots() {
+      var scaleX = bgImg.clientWidth / iSize.width;
+      var scaleY = bgImg.clientHeight / iSize.height;
+      spots.forEach(function (s) {
+        s.el.style.left   = (s.obj.x * scaleX) + 'px';
+        s.el.style.top    = (s.obj.y * scaleY) + 'px';
+        s.el.style.width  = (s.obj.w * scaleX) + 'px';
+        s.el.style.height = (s.obj.h * scaleY) + 'px';
+      });
+    }
+
+    function buildSpots() {
+      objs.forEach(function (obj) {
+        var imgs = obj.images || [];
+        if (!imgs.length) return;
+        var loop = obj.loop !== false;
+        var idx = typeof obj.startIndex === 'number' ? obj.startIndex : 0;
+        if (idx < 0 || idx >= imgs.length) idx = 0;
+
+        var spot = el('div', { class: 'mula-click-spot' + (debug ? ' debug' : '') });
+        var img = el('img', { src: imgs[idx], draggable: 'false' });
+        spot.appendChild(img);
+
+        spot.addEventListener('click', function () {
+          idx++;
+          if (idx >= imgs.length) {
+            if (loop) idx = 0;
+            else { idx = imgs.length - 1; return; }
+          }
+          img.src = imgs[idx];
+        });
+
+        stage.appendChild(spot);
+        spots.push({ el: spot, obj: obj });
+      });
+      layoutSpots();
+    }
+
+    if (bgImg.complete && bgImg.naturalWidth) buildSpots();
+    else bgImg.onload = buildSpots;
+
+    window.addEventListener('resize', layoutSpots);
+  }
+
+  // ============================================================
+  // GAME: TIMED-PREVIEW
+  // Find-objects variant with a "Apskati oriģinālu" button that shows
+  // the original image fullscreen for N seconds with a visible countdown,
+  // then hides it. Player then finds missing objects on the modified image.
+  //
+  // Config:
+  //   type: 'timed-preview'
+  //   image: URL of modified image (what player explores)
+  //   originalImage: URL shown during preview
+  //   previewSeconds: 5 — how long the preview stays (default 5)
+  //   imageSize: { width, height }
+  //   objects: [{ x, y, w, h, alpha?, alphaDebug?, fill? }]  — same as find-objects
+  //   color: hex for highlight (default '#e6381b')
+  //   previewLabel: 'Apskati oriģinālu' (default)
+  //   previewsAllowed: number (default Infinity) — how many times they can peek
+  //   caption, taskText, pdfUrl, debug
+  // ============================================================
+  function initTimedPreview(container, config) {
+    var iSize = config.imageSize || { width: 800, height: 600 };
+    var objs = config.objects || [];
+    var color = config.color || '#e6381b';
+    var previewSeconds = typeof config.previewSeconds === 'number' ? config.previewSeconds : 5;
+    var previewLabel = config.previewLabel || 'Apskati oriģinālu';
+    var previewsAllowed = typeof config.previewsAllowed === 'number' ? config.previewsAllowed : Infinity;
+    var debug = !!config.debug;
+
+    function hexToRgb(hex) {
+      hex = hex.replace('#', '');
+      if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+      return {
+        r: parseInt(hex.substring(0, 2), 16),
+        g: parseInt(hex.substring(2, 4), 16),
+        b: parseInt(hex.substring(4, 6), 16)
+      };
+    }
+    var rgb = hexToRgb(color);
+
+    var wrapper = el('div', { class: 'mula-timed-wrapper' });
+
+    // Preview button
+    var toolbar = el('div', { class: 'mula-timed-toolbar' });
+    var previewBtn = el('button', { class: 'mula-timed-btn' }, previewLabel);
+    toolbar.appendChild(previewBtn);
+    wrapper.appendChild(toolbar);
+
+    // Build image column (reusing find-objects style)
+    var column = el('div', { class: 'mula-find-column single' });
+    var imgContainer = el('div', { class: 'mula-find-svg-container' });
+    imgContainer.style.position = 'relative';
+    var mainImg = el('img', { src: config.image, draggable: 'false' });
+    mainImg.style.cssText = 'max-width:85vw;max-height:70vh;display:block;user-select:none;';
+    imgContainer.appendChild(mainImg);
+    column.appendChild(imgContainer);
+    if (config.caption) column.appendChild(el('div', { class: 'mula-caption' }, config.caption));
+
+    var footer = el('div', { class: 'mula-find-footer' });
+    var label = el('span', { class: 'mula-find-footer-label' }, 'Atrast');
+    var countEl = el('span', { class: 'mula-find-footer-count' }, '0');
+    countEl.style.background = color;
+    footer.appendChild(label);
+    footer.appendChild(countEl);
+    column.appendChild(footer);
+
+    wrapper.appendChild(column);
+    container.appendChild(wrapper);
+
+    // Build find-object click areas (same as find-objects logic)
+    var foundSet = new Set();
+    var foundCount = 0;
+
+    mainImg.onload = function () {
+      var scaleX = mainImg.clientWidth / iSize.width;
+      var scaleY = mainImg.clientHeight / iSize.height;
+
+      objs.forEach(function (obj, idx) {
+        var area = el('div');
+        var hasDebug = debug || typeof obj.alphaDebug === 'number';
+        var objFill = typeof obj.fill === 'number' ? obj.fill : 1;
+
+        var initBorder, initBg;
+        if (hasDebug) {
+          var da = (typeof obj.alphaDebug === 'number' ? obj.alphaDebug : 30) / 100;
+          initBorder = '2px dashed rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + Math.max(da, 0.3) + ')';
+          initBg = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + da + ')';
+        } else {
+          initBorder = '2px solid transparent';
+          initBg = 'transparent';
+        }
+
+        area.style.cssText = 'position:absolute;cursor:pointer;border:' + initBorder + ';border-radius:4px;' +
+          'background:' + initBg + ';' +
+          'left:' + (obj.x * scaleX) + 'px;top:' + (obj.y * scaleY) + 'px;' +
+          'width:' + (obj.w * scaleX) + 'px;height:' + (obj.h * scaleY) + 'px;';
+
+        area.addEventListener('click', function () {
+          if (foundSet.has(idx)) return;
+          foundSet.add(idx);
+          foundCount++;
+          countEl.textContent = foundCount;
+          var a = typeof obj.alpha === 'number' ? obj.alpha / 100 : 0.2;
+          area.style.borderColor = color;
+          area.style.borderStyle = 'solid';
+          if (objFill) {
+            area.style.background = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + a + ')';
+          } else {
+            area.style.background = 'transparent';
+          }
+        });
+        imgContainer.appendChild(area);
+      });
+    };
+
+    // Preview overlay logic
+    var previewsUsed = 0;
+    previewBtn.addEventListener('click', function () {
+      if (previewsUsed >= previewsAllowed) return;
+      previewsUsed++;
+
+      var overlay = el('div', { class: 'mula-timed-overlay' });
+      var origImg = el('img', { class: 'mula-timed-overlay-img', src: config.originalImage, draggable: 'false' });
+      var countdown = el('div', { class: 'mula-timed-countdown' }, String(previewSeconds));
+      overlay.appendChild(origImg);
+      overlay.appendChild(countdown);
+      document.body.appendChild(overlay);
+
+      var remaining = previewSeconds;
+      var timer = setInterval(function () {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(timer);
+          overlay.remove();
+          if (previewsUsed >= previewsAllowed) {
+            previewBtn.disabled = true;
+          }
+        } else {
+          countdown.textContent = String(remaining);
+        }
+      }, 1000);
+    });
+  }
+
+  // ============================================================
   // MAIN API
   // ============================================================
   const MulaEngine = {
@@ -1080,7 +1329,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
      * Initialize a game.
      * @param {string|HTMLElement} target - CSS selector or DOM element
      * @param {Object} config - Game configuration
-     * @param {string} config.type - 'find-objects'|'obj-viewer'|'drag-objects'|'reveal-image'|'hidden-objects'
+     * @param {string} config.type - 'find-objects'|'obj-viewer'|'drag-objects'|'reveal-image'|'hidden-objects'|'click-through'|'timed-preview'
      *
      * Find-objects (single image):
      *   image, caption, objects:[{x,y,w,h}], imageSize:{width,height}
@@ -1094,6 +1343,9 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
      * Reveal-image: image, imageSize:{width,height}, objects:[{x,y,w,h,image}], debug, revealOnce
      * Hidden-objects: image, hiddenImage, imageSize, radius, feather, hideCursor,
      *                 ringWidth, ringColor, objects:[{x,y,w,h,label}] (optional), color, debug
+     * Click-through: image, imageSize, objects:[{x,y,w,h,images:[urls],startIndex,loop}], debug
+     * Timed-preview: image, originalImage, previewSeconds, previewLabel, previewsAllowed,
+     *                imageSize, objects:[{x,y,w,h,alpha,fill}], color, debug
      * Common: taskText, pdfUrl, mulaAssetsPath, checkOrientation
      */
     init: function (target, config) {
@@ -1144,12 +1396,18 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
         case 'hidden-objects':
           initHiddenObjects(gameArea, config);
           break;
+        case 'click-through':
+          initClickThrough(gameArea, config);
+          break;
+        case 'timed-preview':
+          initTimedPreview(gameArea, config);
+          break;
         default:
           console.error('MulaEngine: Unknown game type:', config.type);
       }
     },
 
-    version: '1.4.0'
+    version: '1.5.0'
   };
 
   // Export

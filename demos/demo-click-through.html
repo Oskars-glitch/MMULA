@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mazā Mula – Nomaini vāzes</title>
+  <script src="../mula-engine.js"></script>
+</head>
+<body>
+  <div id="game"></div>
+  <script>
+    // CLICK-THROUGH
+    // Each hotspot cycles through a list of PNG variants.
+    // Coordinates/size scale proportionally with the background.
+    // Each variant image should be the same size as its {w, h} box.
+    MulaEngine.init('#game', {
+      type: 'click-through',
+      image: 'assets/img/Vazes/background.png',
+      imageSize: { width: 600, height: 700 },
+      objects: [
+        {
+          x: 80, y: 60, w: 180, h: 260,
+          images: [
+            'assets/img/Vazes/vaze1.png',
+            'assets/img/Vazes/vaze2.png',
+            'assets/img/Vazes/vaze3.png',
+            'assets/img/Vazes/vaze4.png'
+          ]
+        },
+        {
+          x: 320, y: 60, w: 180, h: 260,
+          images: [
+            'assets/img/Vazes/vaze2.png',
+            'assets/img/Vazes/vaze3.png',
+            'assets/img/Vazes/vaze4.png'
+          ]
+        },
+        {
+          x: 80, y: 380, w: 180, h: 260,
+          images: [
+            'assets/img/Vazes/vaze3.png',
+            'assets/img/Vazes/vaze4.png'
+          ],
+          loop: true
+        },
+        {
+          x: 320, y: 380, w: 180, h: 260,
+          images: [
+            'assets/img/Vazes/vaze4.png',
+            'assets/img/Vazes/vaze1.png',
+            'assets/img/Vazes/vaze2.png'
+          ],
+          startIndex: 1
+        }
+      ],
+      // debug: true, // uncomment to see spot outlines
+      taskText: 'Klikšķini uz vāzēm, lai pārslēgtu to izskatu!',
+      mulaAssetsPath: '../mula-assets/',
+      caption: 'Vāžu variācijas'
+    });
+  </script>
+</body>
+</html>

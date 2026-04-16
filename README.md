@@ -1,329 +1,358 @@
-# Mazā Mula Game Engine v1.4.0
+# Mazā Mula Game Engine (MMULA)
 
-A standalone JavaScript game engine for educational art games, featuring interactive learning experiences based on cultural heritage and art education.
+A small, standalone JavaScript engine for building educational art games. Designed so that students and teachers can create interactive exercises by writing a single short HTML file — without touching the engine code.
 
-## Overview
+One `<script>` tag, one `MulaEngine.init(...)` call, and you get a fully styled game with task bubble, mobile orientation hints, PDF materials viewer, and responsive scaling.
 
-The Mula Engine is a lightweight, flexible framework designed to create engaging educational games without external dependencies (except Three.js for 3D viewing). It supports multiple game types with responsive, mobile-friendly interfaces and a unified design system.
+**Current version:** 1.5.0
 
-**Current Version:** 1.4.0
+---
 
-## Features
+## Quick start
 
-### Supported Game Types
-
-1. **Find Objects** (`find-objects`)
-   - Single or dual-image comparison gameplay
-   - Interactive click-based object discovery
-   - Visual highlighting with customizable colors and opacity
-   - Automatic counter for found objects
-   - Debug mode for teacher positioning
-
-2. **3D Object Viewer** (`obj-viewer`)
-   - OBJ/MTL model loading and rendering (Three.js)
-   - Material/texture swapping via sidebar thumbnails
-   - Orbit controls for model interaction
-   - Responsive canvas sizing
-   - Support for multiple material variations
-
-3. **Drag Objects** (`drag-objects`)
-   - Free placement of image pieces on a background painting
-   - Drag-and-drop with boundary constraints
-   - Layer controls (up, down, delete)
-   - Compare view with original artwork
-   - Z-index management for layering
-
-4. **Reveal Image** (`reveal-image`)
-   - Hidden image areas revealed on click
-   - Per-spot custom images
-   - Toggle or permanent reveal modes
-   - Debug positioning helpers
-   - Responsive scaling
-
-5. **Hidden Objects (Spotlight)** (`hidden-objects`)
-   - Circular spotlight mechanic (flashlight effect)
-   - Foreground image revealed by cursor movement
-   - Soft-edged gradient mask with customizable feather
-   - Optional find-objects integration
-   - Visual ring indicator around spotlight
-   - Desktop and touch support
-
-## Core Components
-
-### Info Bar
-- Refresh button (restart game)
-- PDF viewer button (for methodological materials)
-- Task bubble with character animation
-- Mobile-responsive sidebar
-
-### Styling System
-- Built-in comprehensive CSS (injected at runtime)
-- Responsive design for desktop and mobile
-- Orientation detection and landscape prompts
-- Customizable color scheme per game
-
-## API Usage
-
-### Basic Initialization
-
-```javascript
-MulaEngine.init(target, config);
-```
-
-**Parameters:**
-- `target` - CSS selector (string) or DOM element
-- `config` - Game configuration object
-
-### Configuration Examples
-
-#### Find Objects (Single Image)
-```javascript
-MulaEngine.init('#game-container', {
-  type: 'find-objects',
-  image: 'assets/img/painting.jpg',
-  imageSize: { width: 1920, height: 1440 },
-  caption: 'Find the hidden objects',
-  objects: [
-    { x: 100, y: 150, w: 80, h: 100, alpha: 20 },
-    { x: 400, y: 300, w: 60, h: 80, alpha: 15 }
-  ],
-  color: '#e6381b',
-  taskText: 'Click on each object you find',
-  mulaAssetsPath: 'mula-assets/'
-});
-```
-
-#### Find Objects (Dual Images)
-```javascript
-MulaEngine.init('#game-container', {
-  type: 'find-objects',
-  imageLeft: 'assets/left.jpg',
-  imageRight: 'assets/right.jpg',
-  captionLeft: 'Before',
-  captionRight: 'After',
-  imageSize: { width: 800, height: 600 },
-  objectsLeft: [...],
-  objectsRight: [...]
-});
-```
-
-#### 3D Object Viewer
-```javascript
-MulaEngine.init('#game-container', {
-  type: 'obj-viewer',
-  objUrl: 'assets/model.obj',
-  mtlUrl: 'assets/model.mtl',
-  bgColor: 0xF4EDDF,
-  caption: 'Rotate to view the sculpture',
-  textures: [
-    { thumb: 'thumb-bronze.png', mtlUrl: 'assets/bronze.mtl', label: 'Bronze' },
-    { thumb: 'thumb-marble.png', mtlUrl: 'assets/marble.mtl', label: 'Marble' }
-  ]
-});
-```
-
-#### Drag Objects
-```javascript
-MulaEngine.init('#game-container', {
-  type: 'drag-objects',
-  backgroundImage: 'assets/canvas.jpg',
-  originalImage: 'assets/original.jpg',
-  caption: 'Arrange the pieces to complete the artwork',
-  objects: [
-    { src: 'assets/piece1.png' },
-    { src: 'assets/piece2.png' }
-  ],
-  taskText: 'Drag pieces to reconstruct the painting'
-});
-```
-
-#### Reveal Image
-```javascript
-MulaEngine.init('#game-container', {
-  type: 'reveal-image',
-  image: 'assets/bg.jpg',
-  imageSize: { width: 1024, height: 768 },
-  objects: [
-    { x: 100, y: 200, w: 150, h: 150, image: 'assets/hidden1.png' },
-    { x: 400, y: 300, w: 100, h: 100, image: 'assets/hidden2.png' }
-  ],
-  debug: false,
-  revealOnce: true
-});
-```
-
-#### Hidden Objects (Spotlight)
-```javascript
-MulaEngine.init('#game-container', {
-  type: 'hidden-objects',
-  image: 'assets/background.jpg',
-  hiddenImage: 'assets/foreground.jpg',
-  imageSize: { width: 800, height: 600 },
-  radius: 100,
-  feather: 30,
-  ringWidth: 2,
-  ringColor: '#2196F3',
-  hideCursor: true,
-  objects: [
-    { x: 150, y: 200, w: 80, h: 80, label: 'Find the tree' },
-    { x: 500, y: 400, w: 60, h: 60, label: 'Find the bird' }
-  ],
-  debug: false
-});
-```
-
-### Common Configuration Options
-
-| Option | Type | Description |
-|--------|------|-------------|
-| `type` | string | Game type ('find-objects', 'obj-viewer', 'drag-objects', 'reveal-image', 'hidden-objects') |
-| `taskText` | string | Instructions shown in the info bubble |
-| `pdfUrl` | string | URL to PDF for methodological materials |
-| `mulaAssetsPath` | string | Path to Mula character/icon assets (default: 'mula-assets/') |
-| `checkOrientation` | boolean | Show landscape hint on mobile (default: true) |
-| `caption` | string | Game area caption |
-| `color` | string | Hex color for highlights (default: '#e6381b') |
-
-## File Structure
-
-```
-mula-engine.js                    # Main engine file
-demos/                            # Demo pages
-├── demo-find-objects.html
-├── demo-3d-viewer-textures.html
-├── demo-drag-objects.html
-├── demo-reveal-image.html
-├── demo-hidden-objects.html
-└── assets/                       # Game assets
-    ├── img/                      # Background images and art
-    ├── obj/                      # 3D models (.obj, .mtl)
-    └── pdf/                      # Educational materials
-mula-assets/                      # UI assets (character, icons)
-data/                             # Game configuration data (SVG data)
-```
-
-## Key Features
-
-### Responsive Design
-- Automatically scales to viewport
-- Mobile touch support for drag games and spotlight mechanics
-- Orientation detection with landscape prompts
-- Sidebar adapts to mobile layouts
-
-### Accessibility
-- Keyboard and mouse support
-- Touch input support for all interactive elements
-- Debug mode for teacher positioning
-- Customizable colors and highlight visibility
-
-### Performance
-- Lightweight (~50KB uncompressed)
-- No external framework dependencies (Three.js optional for 3D)
-- Efficient DOM manipulation
-- Canvas-based rendering for 3D viewer
-
-### Educational Features
-- Task descriptions with character personality
-- Multiple game modes for varied learning styles
-- Comparison tools for critical thinking
-- Debug positioning for accurate game creation
-
-## Recent Updates (v1.4.0)
-
-- Enhanced 3D viewer with improved material loading
-- Added spotlight mode with soft-edged mask gradient
-- Improved drag-objects boundary constraints
-- Better thumbnail loading and scaling
-- Enhanced mobile responsiveness
-- Added layer controls (up/down/delete) for drag objects
-- Spotlight ring visual indicator
-- Improved PDF overlay viewer
-
-## Dependencies
-
-### Required
-- None (vanilla JavaScript)
-
-### Optional
-- **Three.js** - For 3D model viewing (`obj-viewer` game type)
-- **OBJLoader** - For loading OBJ files
-- **MTLLoader** - For loading material files
-- **OrbitControls** - For 3D camera interaction
-
-## Browser Support
-
-- Modern browsers with ES6 support
-- Chrome, Firefox, Safari, Edge (current versions)
-- Mobile browsers (iOS Safari, Chrome)
-- Touch input support for interactive games
-
-## Asset Preparation Guide
-
-### Images
-- Optimize for web (compress without quality loss)
-- Provide natural pixel dimensions for accurate scaling
-- PNG for transparency, JPG for photographs
-
-### 3D Models
-- OBJ format with accompanying MTL file
-- Material names must match between OBJ and MTL
-- Optimize geometry for web performance
-- Test texture paths before deployment
-
-### Coordinates
-- All coordinates are in natural image/model pixels
-- Origin (0,0) is top-left
-- X increases rightward, Y increases downward
-- Scaling is automatic based on image display size
-
-## Usage Example
-
-```<!DOCTYPE html>
+```html
+<!DOCTYPE html>
 <html lang="lv">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mazā Mula – Atklāj attēlu</title>
-  <script src="https://cdn.jsdelivr.net/gh/Oskars-glitch/MMULA@main/mula-engine.js"></script>
+  <title>My Mula Game</title>
+  <script src="../mula-engine.js"></script>
 </head>
 <body>
   <div id="game"></div>
   <script>
-    // REVEAL IMAGE — click on invisible spots on the background to reveal hidden images.
-    // Each object's image should ideally be the same size as its {w, h} box so it fits
-    // perfectly — the engine scales everything proportionally with the background.
     MulaEngine.init('#game', {
-      type: 'reveal-image',
-      image: 'assets/img/KlusaDaba/Lancmanis_Klusa_daba.jpg',
+      type: 'find-objects',
+      image: 'assets/my-painting.jpg',
       imageSize: { width: 934, height: 768 },
       objects: [
-        { x: 80,  y: 120, w: 130, h: 180, image: 'assets/img/box_01.png' },
-        { x: 310, y: 250, w: 100, h: 140, image: 'assets/img/box_02.png' },
-        { x: 500, y: 100, w: 140, h: 120, image: 'assets/img/box_03.png' },
-        { x: 650, y: 300, w: 120, h: 160, image: 'assets/img/box_04.png' }
+        { x: 80, y: 120, w: 130, h: 180 }
       ],
-      // debug: true,      // show spot outlines while positioning
-      // revealOnce: false, // allow toggling (click again to hide)
-      taskText: 'Uzklikšķini uz gleznas, lai atklātu paslēptos attēlus!',
-      pdfUrl: 'assets/pdf/KlusaDaba/2/2_1_Enas_dabu_gaisma_rada.pdf',
+      taskText: 'Atrodi priekšmetus gleznā!',
       mulaAssetsPath: '../mula-assets/',
-      caption: 'Imants Lancmanis. Klusā daba – atklāj detaļas'
+      caption: 'Mana glezna'
     });
   </script>
 </body>
 </html>
 ```
 
-## Version History
+That's it. The engine injects its own CSS, builds the UI, and handles scaling, touch input, and mobile layout automatically.
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.4.0 | 2026 | Spotlight game, enhanced 3D viewer, layer controls, improved mobile support |
-| 1.3.0 | 2026 | Reveal-image game type, debug mode, enhanced styling |
-| 1.2.0 | 2026 | Drag-objects game, PDF viewer, info bar improvements |
-| 1.1.0 | 2026 | 3D viewer with texture swapping |
-| 1.0.0 | 2026 | Initial release with find-objects game |
+---
+
+## Project structure
+
+```
+MMULA/
+├── mula-engine.js        # The engine (one file, no dependencies except THREE for 3D)
+├── mula-assets/          # Shared UI assets (Mula character, icons)
+│   ├── Mula_doma.png
+│   ├── icon-close-menu.svg
+│   └── icon-chevron-right.svg
+├── games/                # Student games live here
+│   ├── demo-find-objects.html
+│   ├── demo-find2.html
+│   ├── demo-drag-objects.html
+│   ├── demo-3d-viewer.html
+│   ├── demo-3d-viewer-textures.html
+│   ├── demo-reveal-image.html
+│   ├── demo-hidden-objects.html
+│   ├── demo-click-through.html
+│   ├── demo-timed-preview.html
+│   └── assets/           # Per-game images, models, PDFs
+└── README.md
+```
+
+Paths in each HTML are written relative to that HTML file, so placing the engine one folder above the games (as in demos) lets you reference it as `../mula-engine.js`.
+
+---
+
+## Game types
+
+| Type             | What it does |
+| ---------------- | ------------ |
+| `find-objects`   | Click to find hotspots on one or two images. |
+| `drag-objects`   | Drag PNG pieces from a scrollable sidebar onto a painting, reorder layers, delete. |
+| `obj-viewer`     | 3D OBJ/MTL viewer with orbit controls; optional clickable texture previews swap the material live. |
+| `reveal-image`   | Clickable invisible spots reveal hidden images underneath. |
+| `hidden-objects` | Spotlight reveal — a flashlight-style circle around the cursor shows a hidden overlay image. Can be combined with find-objects. |
+| `click-through`  | Clickable hotspots that cycle through a list of image variants (e.g., repaint a vase by clicking it). |
+| `timed-preview`  | Shows the original image for a few seconds with a countdown, then lets the player find what's missing on the modified version. |
+
+---
+
+## Common config (all types)
+
+| Option            | Type    | Description |
+| ----------------- | ------- | ----------- |
+| `type`            | string  | One of the types above. Required. |
+| `taskText`        | string  | Task description shown in Mula's speech bubble. |
+| `caption`         | string  | Small caption below the image (e.g., artwork + author). |
+| `pdfUrl`          | string  | Optional PDF (methodical materials). Adds a 📄 button to the info bar. |
+| `mulaAssetsPath`  | string  | Path to `mula-assets/` relative to the HTML (default `'mula-assets/'`). |
+| `checkOrientation`| boolean | If `true` (default), shows a "rotate your device" hint in portrait on mobile. |
+
+---
+
+## Coordinate system
+
+For every game type that uses `objects`, coordinates are given in the **natural pixel space of the image** (`imageSize: { width, height }`). The engine scales them proportionally when the image is resized to fit the browser, so you only have to measure coordinates once from the original full-size image.
+
+Every object uses the same box: `{ x, y, w, h }` — top-left corner plus width/height, in that natural pixel space.
+
+---
+
+## Game type reference
+
+### `find-objects`
+
+Classic "click-to-find" game with one or two images side by side.
+
+**Single image mode:**
+```js
+MulaEngine.init('#game', {
+  type: 'find-objects',
+  image: 'assets/painting.jpg',
+  imageSize: { width: 934, height: 768 },
+  objects: [
+    { x: 80, y: 120, w: 130, h: 180, alpha: 30, fill: 1, label: 'Ābols' }
+  ],
+  taskText: 'Atrodi 4 lietas.',
+  caption: 'Klusā daba'
+});
+```
+
+**Two images mode:**
+```js
+MulaEngine.init('#game', {
+  type: 'find-objects',
+  imageLeft: 'assets/original.jpg',
+  imageRight: 'assets/modified.png',
+  imageSize: { width: 934, height: 768 },
+  objectsLeft:  [ { x: 80, y: 120, w: 130, h: 180, alpha: 30 } ],
+  objectsRight: [ { x: 80, y: 120, w: 130, h: 180, alpha: 30 } ],
+  captionLeft: 'Oriģināls',
+  captionRight: 'Modificēts'
+});
+```
+
+**Per-object options:**
+
+| Option       | Default | Description |
+| ------------ | ------- | ----------- |
+| `alpha`      | `20`    | Fill opacity % when found. |
+| `alphaDebug` | —       | If set, highlight the area before clicking (for positioning). |
+| `fill`       | `1`     | `0` = border only when found, `1` = filled. |
+| `label`      | —       | Optional tooltip text. |
+
+**Global options:** `color` (hex, default `#e6381b`), `fill` (bool), `debug` (bool).
+
+---
+
+### `drag-objects`
+
+Drag PNG pieces from a sidebar onto a background painting. Each piece keeps its original natural size (scaled proportionally to the background). Layer controls (up/down/delete) sit next to the canvas.
+
+```js
+MulaEngine.init('#game', {
+  type: 'drag-objects',
+  backgroundImage: 'assets/painting_empty.png',
+  originalImage: 'assets/painting_original.jpg',
+  objects: [
+    { src: 'assets/piece1.png' },
+    { src: 'assets/piece2.png' },
+    { src: 'assets/piece3.png' }
+  ],
+  taskText: 'Novieto priekšmetus uz gleznas!',
+  caption: 'Klusā daba'
+});
+```
+
+**Behavior:**
+
+- Sidebar is scrollable internally (fits any number of pieces).
+- Dragging a thumb places it on the canvas and removes it from the sidebar list.
+- Clicking 🗑 on a placed piece deletes it and returns the thumb to the sidebar.
+- Pieces can be reordered with ↑ / ↓ layer buttons.
+- If `originalImage` is provided, a "Salīdzināt ar oriģinālu" button appears to compare.
+
+---
+
+### `obj-viewer`
+
+A 3D model viewer with orbit controls (Three.js). Optionally shows a sidebar of texture previews — clicking a preview swaps the MTL file on the already-loaded geometry.
+
+**Required scripts** (load before `mula-engine.js`):
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+```
+
+**Basic usage:**
+```js
+MulaEngine.init('#game', {
+  type: 'obj-viewer',
+  objUrl: 'assets/granita.obj',
+  mtlUrl: 'assets/granita.mtl',
+  bgColor: 0xF4EDDF,
+  taskText: 'Pagrozi 3D modeli!',
+  caption: 'Granīta skulptūra'
+});
+```
+
+**With texture swap sidebar:**
+```js
+MulaEngine.init('#game', {
+  type: 'obj-viewer',
+  objUrl: 'assets/granita.obj',
+  mtlUrl: 'assets/granita.mtl',
+  textures: [
+    { thumb: 'previews/granita.png', mtlUrl: 'assets/granita.mtl', label: 'Granīts' },
+    { thumb: 'previews/bronze.png',  mtlUrl: 'assets/bronze.mtl',  label: 'Bronza' },
+    { thumb: 'previews/marble.png',  mtlUrl: 'assets/marble.mtl',  label: 'Marmors' }
+  ]
+});
+```
+
+All MTL files must reference the same material names used in the OBJ; the engine calls `materials.create(name)` for each mesh so the geometry stays loaded.
+
+---
+
+### `reveal-image`
+
+Click invisible spots on a background to reveal images underneath. Each revealed image is scaled to its spot's `{ w, h }`.
+
+```js
+MulaEngine.init('#game', {
+  type: 'reveal-image',
+  image: 'assets/painting.jpg',
+  imageSize: { width: 934, height: 768 },
+  objects: [
+    { x: 80,  y: 120, w: 130, h: 180, image: 'assets/detail1.jpg' },
+    { x: 310, y: 250, w: 100, h: 140, image: 'assets/detail2.jpg' }
+  ],
+  taskText: 'Uzklikšķini uz gleznas, lai atklātu detaļas!'
+});
+```
+
+**Options:** `debug` (show spot outlines), `revealOnce` (default `true`; set `false` to allow toggling).
+
+Each revealed image should be the same dimensions as its spot box for a clean fit.
+
+---
+
+### `hidden-objects`
+
+A flashlight-style spotlight around the cursor reveals a hidden overlay image on top of a visible background. Optionally combine with find-object hotspots.
+
+```js
+MulaEngine.init('#game', {
+  type: 'hidden-objects',
+  image: 'assets/visible.jpg',
+  hiddenImage: 'assets/hidden.jpg',
+  imageSize: { width: 934, height: 768 },
+  radius: 110,
+  feather: 25,
+  ringWidth: 2,
+  ringColor: '#2196F3',
+  objects: [
+    { x: 80, y: 120, w: 130, h: 180, label: 'Ābols' }
+  ],
+  taskText: 'Izgaismo gleznu un atrodi priekšmetus!'
+});
+```
+
+| Option       | Default     | Description |
+| ------------ | ----------- | ----------- |
+| `radius`     | `90`        | Spotlight radius in px. |
+| `feather`    | `20`        | Soft edge width in px. |
+| `ringWidth`  | `2`         | Visible ring thickness in px. `0` hides the ring. |
+| `ringColor`  | `'#2196F3'` | Ring color (any CSS color). |
+| `hideCursor` | `true`      | Hide the OS cursor over the stage. |
+| `objects`    | `[]`        | Optional find-area hotspots. |
+
+`hiddenImage` must be the same dimensions as `image` so overlays align.
+
+---
+
+### `click-through`
+
+Hotspots that cycle through an array of image variants when clicked.
+
+```js
+MulaEngine.init('#game', {
+  type: 'click-through',
+  image: 'assets/background.png',
+  imageSize: { width: 600, height: 700 },
+  objects: [
+    {
+      x: 80, y: 60, w: 180, h: 260,
+      images: [
+        'assets/vase_a.png',
+        'assets/vase_b.png',
+        'assets/vase_c.png'
+      ]
+    }
+  ],
+  taskText: 'Klikšķini uz vāzēm, lai pārslēgtu to izskatu!'
+});
+```
+
+| Per-object option | Default | Description |
+| ----------------- | ------- | ----------- |
+| `images`          | —       | Array of image URLs to cycle through. Required. |
+| `startIndex`      | `0`     | Which image to show first. |
+| `loop`            | `true`  | Wrap back to first after the last. |
+
+Each variant image should match the spot's `{ w, h }` for a clean fit.
+
+---
+
+### `timed-preview`
+
+Shows the original image fullscreen for a few seconds with a countdown, then hides it. The player finds missing/changed objects on the modified version. Find-area logic is identical to `find-objects`.
+
+```js
+MulaEngine.init('#game', {
+  type: 'timed-preview',
+  image: 'assets/modified.png',
+  originalImage: 'assets/original.jpg',
+  previewSeconds: 5,
+  imageSize: { width: 934, height: 768 },
+  objects: [
+    { x: 80, y: 120, w: 130, h: 180, alpha: 30 }
+  ],
+  taskText: 'Apskati oriģinālu un atrodi, kas ir pazudis!'
+});
+```
+
+| Option             | Default              | Description |
+| ------------------ | -------------------- | ----------- |
+| `previewSeconds`   | `5`                  | How long the original is shown. |
+| `previewLabel`     | `'Apskati oriģinālu'`| Button label. |
+| `previewsAllowed`  | `Infinity`           | How many peeks the player gets. |
+
+---
+
+## Tips for positioning hotspots
+
+While laying out coordinates, add `debug: true` at the top level (or `alphaDebug: 30` per object in `find-objects`) to visualize the boxes on top of the image. Remove the flag before publishing.
+
+---
+
+## Browser support
+
+- Modern browsers with CSS `mask-image` support (Chrome, Edge, Firefox, Safari). The `hidden-objects` spotlight uses radial-gradient masks.
+- Touch input is supported across all game types; mobile layout collapses sidebars to horizontal strips.
+- 3D viewer requires WebGL.
+
+---
 
 ## License
 
-Part of the Mazā Mula educational platform for art and cultural heritage learning.
+Educational use. Feel free to fork and adapt.

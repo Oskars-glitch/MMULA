@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mazā Mula – Atceries un atrodi</title>
+  <script src="../mula-engine.js"></script>
+</head>
+<body>
+  <div id="game"></div>
+  <script>
+    // TIMED-PREVIEW
+    // Player clicks "Apskati oriģinālu" to flash the original for N seconds
+    // (with a countdown), then must find missing/changed objects on the
+    // modified image. Find-area clicks work exactly like find-objects.
+    MulaEngine.init('#game', {
+      type: 'timed-preview',
+      image: 'assets/img/KlusaDaba/Lancmanis/2/Lancmanis_Klusa_daba_bez_3_bundzam.png',
+      originalImage: 'assets/img/KlusaDaba/Lancmanis_Klusa_daba.jpg',
+      imageSize: { width: 934, height: 768 },
+      previewSeconds: 5,              // how long the original shows
+      previewLabel: 'Apskati oriģinālu', // button label (optional)
+      // previewsAllowed: 2,           // max peeks (default Infinity)
+      objects: [
+        { x: 80,  y: 120, w: 130, h: 180, alpha: 30 },
+        { x: 310, y: 250, w: 100, h: 140, alpha: 30 },
+        { x: 500, y: 100, w: 140, h: 120, alpha: 30 },
+        { x: 650, y: 300, w: 120, h: 160, alpha: 30 }
+      ],
+      taskText: 'Apskati oriģinālu un atrodi, kas ir pazudis!',
+      pdfUrl: 'assets/pdf/KlusaDaba/2/2_1_Enas_dabu_gaisma_rada.pdf',
+      mulaAssetsPath: '../mula-assets/',
+      caption: 'Imants Lancmanis. Klusā daba – kas pazudis?'
+    });
+  </script>
+</body>
+</html>
