@@ -17,7 +17,7 @@ One `<script>` tag, one `MulaEngine.init(...)` call, and you get a fully styled 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Mula Game</title>
-  <script src="../mula-engine.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/Oskars-glitch/MMULA@main/mula-engine.js"></script>
 </head>
 <body>
   <div id="game"></div>
