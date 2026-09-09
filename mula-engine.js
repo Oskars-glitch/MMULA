@@ -125,7 +125,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 .mula-dragobj-piece img { width: 100%; height: 100%; pointer-events: none; display: block; }
 .mula-dragobj-piece.selected { outline: 2px solid #2196F3; outline-offset: 4px; }
 .mula-layer-panel { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem; background: #4CAF50; border-radius: 8px; align-self: flex-start; margin-top: 1rem; }
-.mula-layer-btn { width: 40px; height: 40px; background: transparent; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.mula-layer-btn { width: 44px; height: 44px; /* D15: 44 px tap target */ background: transparent; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .mula-layer-btn:hover { background: rgba(255,255,255,0.2); }
 .mula-layer-btn svg { width: 24px; height: 24px; }
 .mula-dragobj-sidebar {
@@ -141,8 +141,12 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 .mula-dragobj-sidebar .mula-dragobj-thumb:hover { border-color: #e6381b; }
 .mula-dragobj-compare { flex: 1; display: flex; flex-direction: row; gap: 1.5vh; padding: 1vh; justify-content: center; align-items: center; }
 .mula-dragobj-compare .mula-compare-img { flex: 1; max-width: 90vw; height: 80vh; background-size: contain; background-repeat: no-repeat; background-position: center center; }
-.mula-dragobj-buttons { text-align: center; padding: 0.5rem; }
-.mula-dragobj-buttons button { padding: 0.5rem 1.5rem; background: #e6381b; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
+/* SPEC-04 D27: button row, caption and compare view share the painting's axis. The row that holds the
+   painting also holds the layer panel (44 px + 2 x 0.5rem = 60 px) and the piece list (14vh), so the
+   same width is taken off the right. If the list or panel width changes, this number must follow. */
+.mula-dragobj-buttons, .mula-dragobj-wrapper > .mula-caption, .mula-dragobj-compare { padding-left: 0; padding-right: calc(14vh + 60px); }
+.mula-dragobj-buttons { text-align: center; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.mula-dragobj-buttons button { padding: 0.5rem 1.5rem; min-height: 44px; /* D15 */ background: #e6381b; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
 .mula-dragobj-buttons button:hover { background: #c42f17; }
 
 /* === RESPONSIVE / MOBILE === */
@@ -233,12 +237,11 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
   .mula-find-column img { max-width: 45vw !important; max-height: 70vh !important; }
   .mula-find-column.single img { max-width: 90vw !important; }
   .mula-timed-wrapper .mula-find-column img { max-height: 60vh !important; } /* D26: preview button above needs the room */
-  .mula-dragobj-area { flex-direction: column; align-items: center; }
-  .mula-dragobj-sidebar {
-    width: 100%; flex-direction: row; overflow-x: auto; overflow-y: hidden;
-    gap: 0.5rem; padding: 0.5rem; padding-left: 60px; justify-content: center;
-  }
+  /* SPEC-04 D27: phone keeps the desktop row: painting left, piece list (50 px thumbs) and layer panel right */
+  .mula-dragobj-sidebar { width: calc(50px + 1rem); max-height: 70vh; padding: 0.5rem; gap: 0.5rem; }
   .mula-dragobj-sidebar .mula-dragobj-thumb { width: 50px; flex-shrink: 0; }
+  .mula-dragobj-buttons, .mula-dragobj-wrapper > .mula-caption, .mula-dragobj-compare { padding-right: calc(50px + 1rem + 60px); } /* list + panel, see above */
+  .mula-dragobj-compare .mula-compare-img { height: 70vh; } /* D28 */
   .mula-3d-area { flex-direction: column; align-items: center; }
   .mula-3d-sidebar {
     width: 100%; flex-direction: row; overflow-x: auto; overflow-y: hidden;
@@ -248,9 +251,8 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
   .mula-task-bubble { width: 80vw; left: 10vw; padding: 0.75vh; align-content: center; } /* D20 */
   .mula-task-bubble .mula-btn-row:empty { display: none; } /* D20: no download button, no empty 2rem row */
   .mula-infobar { width: auto !important; }
-  .mula-layer-panel { flex-direction: row; align-self: center; margin-top: 0; order: 10; }
-  .mula-dragobj-canvas-wrap { max-height: 70vh; width: 100%; }
-  .mula-dragobj-bg { max-height: 70vh; max-width: 95vw; }
+  .mula-dragobj-canvas-wrap { max-height: 70vh; }
+  .mula-dragobj-bg { max-height: 70vh; }
 }
 @media (orientation: portrait) and (max-width: 900px) {
   .mula-rotate-hint { display: flex !important; }
