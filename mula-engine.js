@@ -45,7 +45,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 }
 .mula-infobar.opened { left: 0; }
 .mula-infobar button {
-  background: none; border: none; cursor: pointer; width: 40px; height: 40px;
+  background: none; border: none; cursor: pointer; width: 44px; height: 44px; /* D15: 44 px tap target, icon stays 28 px */
   background-repeat: no-repeat; background-size: 28px 28px; background-position: center;
   opacity: 0.9; padding: 0;
 }
@@ -69,10 +69,11 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
   position: absolute; left: 0; top: -17.5vh; height: 20vh; width: auto;
 }
 .mula-task-bubble .mula-close-btn {
-  position: absolute; top: -1.5vh; right: -20px; width: 36px; height: 36px;
+  position: absolute; top: -1.5vh; right: -20px; width: 44px; height: 44px; /* D15: 44 px tap target, icon stays 36 px */
   border: none; cursor: pointer; padding: 0; background: none;
+  display: flex; align-items: center; justify-content: center;
 }
-.mula-task-bubble .mula-close-btn img { width: 100%; height: 100%; display: block; }
+.mula-task-bubble .mula-close-btn img { width: 36px; height: 36px; display: block; }
 .mula-task-bubble .mula-btn-row { display: flex; justify-content: center; gap: 1rem; margin-left: auto; min-width: 1px; height: 2rem; }
 .mula-task-bubble .mula-btn-download {
   background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23999"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>') no-repeat left center;
@@ -212,7 +213,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 }
 .mula-pdf-close {
   position: fixed; top: 12px; right: 12px; z-index: 10001;
-  width: 32px; height: 32px; border: none; cursor: pointer;
+  width: 44px; height: 44px; /* D15: 44 px tap target, icon stays 18 px */ border: none; cursor: pointer;
   background: rgba(0,0,0,0.08); border-radius: 50%; opacity: 0.7;
   display: flex; align-items: center; justify-content: center;
 }
@@ -238,7 +239,8 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
     max-height: none; gap: 0.5rem; padding: 0.5rem; justify-content: center;
   }
   .mula-3d-sidebar .mula-3d-thumb { width: 50px; flex-shrink: 0; }
-  .mula-task-bubble { width: 80vw; left: 10vw; }
+  .mula-task-bubble { width: 80vw; left: 10vw; padding: 0.75vh; align-content: center; } /* D20 */
+  .mula-task-bubble .mula-btn-row:empty { display: none; } /* D20: no download button, no empty 2rem row */
   .mula-infobar { width: auto !important; }
   .mula-layer-panel { flex-direction: row; align-self: center; margin-top: 0; order: 10; }
   .mula-dragobj-canvas-wrap { max-height: 70vh; width: 100%; }
@@ -254,7 +256,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
   font-size: 1.3rem; text-align: center; padding: 2rem;
 }
 .mula-rotate-hint .mula-rotate-icon { font-size: 4rem; margin-bottom: 1rem; }
-.mula-rotate-hint .mula-rotate-dismiss { margin-top: 1.5rem; padding: 0.5rem 1.5rem; background: #e6381b; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
+.mula-rotate-hint .mula-rotate-dismiss { margin-top: 1.5rem; padding: 0.5rem 1.5rem; min-height: 44px; /* D15 */ background: #e6381b; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
 `;
 
   // ============================================================
