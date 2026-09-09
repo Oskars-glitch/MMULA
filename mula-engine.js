@@ -226,9 +226,13 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 }
 
 @media (max-width: 768px), (max-height: 500px) {
-  .mula-find-wrapper { flex-direction: column; align-items: center; overflow-y: auto; }
-  .mula-find-column { max-width: 95%; }
-  .mula-find-column img { max-width: 90vw !important; max-height: 40vh !important; }
+  /* SPEC-03: two images stay side by side on phone (D24); image cap 40vh -> 70vh (D23); captions stay (D25) */
+  .mula-find-wrapper { overflow-y: auto; }
+  .mula-find-column { max-width: 48%; }
+  .mula-find-column.single { max-width: 95%; }
+  .mula-find-column img { max-width: 45vw !important; max-height: 70vh !important; }
+  .mula-find-column.single img { max-width: 90vw !important; }
+  .mula-timed-wrapper .mula-find-column img { max-height: 60vh !important; } /* D26: preview button above needs the room */
   .mula-dragobj-area { flex-direction: column; align-items: center; }
   .mula-dragobj-sidebar {
     width: 100%; flex-direction: row; overflow-x: auto; overflow-y: hidden;
