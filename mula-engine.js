@@ -51,10 +51,12 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 }
 .mula-infobar button:hover { opacity: 1; }
 .mula-infobar .mula-btn-refresh {
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>');
+  /* original icon-refresh-1.svg (D21): white disc, red arrow (D22) */
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 54"><circle cx="27" cy="27" r="27" fill="%23ffffff"/><g transform="translate(11,11.5)" fill="none" stroke="%23e6381b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 29,16 C 29,22 24,29 16,29 8,29 3,22 3,16 3,10 8,3 16,3 c 5,0 9,3 11,6 m -7,1 7,-1 1,-7"/></g></svg>');
 }
 .mula-infobar .mula-btn-pdf {
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="8" r="5"/><path d="M3 21c0-4.97 4.03-9 9-9s9 4.03 9 9"/><path d="M12 11v4"/><path d="M10 6c0 0 .5-2 2-2s2 2 2 2"/><path d="M8.5 9.5l-1.5 1"/><path d="M15.5 9.5l1.5 1"/></svg>');
+  /* original icon-download.svg (D21), white on green (D22) */
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"><path d="M28 22 L28 30 4 30 4 22 M16 4 L16 24 M8 16 L16 24 24 16"/></svg>');
 }
 .mula-task-bubble {
   position: fixed; z-index: 5998; left: 3vw; bottom: 83px;
@@ -690,11 +692,11 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
     // Layer controls panel (right side, green with white SVG icons)
     const layerPanel = el('div', { class: 'mula-layer-panel' });
     var btnUp = el('button', { class: 'mula-layer-btn', title: 'Uz augšu' });
-    btnUp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="6" y1="5" x2="18" y2="5"/><polyline points="8 9 12 5 16 9"/></svg>';
+    btnUp.innerHTML = '<svg viewBox="0 0 24 24" fill="white"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>'; // original arrow_upward-24px.svg (D21, D22)
     var btnDown = el('button', { class: 'mula-layer-btn', title: 'Uz leju' });
-    btnDown.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="6" y1="19" x2="18" y2="19"/><polyline points="8 15 12 19 16 15"/></svg>';
+    btnDown.innerHTML = '<svg viewBox="0 0 24 24" fill="white"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>'; // original arrow_downward-24px.svg (D21, D22)
     var btnDel = el('button', { class: 'mula-layer-btn', title: 'Dzēst' });
-    btnDel.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>';
+    btnDel.innerHTML = '<svg viewBox="0 0 32 32" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"><path d="M30 18 L16 5 2 18Z M2 25 L30 25"/></svg>'; // original icon-eject.svg (D21, D22)
     layerPanel.appendChild(btnUp);
     layerPanel.appendChild(btnDown);
     layerPanel.appendChild(btnDel);
