@@ -118,6 +118,9 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 }
 .mula-3d-sidebar .mula-3d-thumb:hover { border-color: #e6381b; }
 .mula-3d-sidebar .mula-3d-thumb.active { border-color: #2196F3; }
+/* SPEC-05 D33: the caption shares the canvas axis; the row above also holds the 14vh texture column,
+   so the same width is taken off the right. If the column width changes, this number must follow. */
+.mula-3d-wrapper > .mula-caption { padding-left: 0; padding-right: 14vh; }
 
 /* === DRAG OBJECTS GAME === */
 .mula-dragobj-wrapper { flex: 1; display: flex; flex-direction: column; }
@@ -245,12 +248,10 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
   .mula-dragobj-sidebar .mula-dragobj-thumb { width: 50px; flex-shrink: 0; }
   .mula-dragobj-buttons, .mula-dragobj-wrapper > .mula-caption, .mula-dragobj-compare { padding-right: calc(50px + 1rem + 60px); } /* list + panel, see above */
   .mula-dragobj-compare .mula-compare-img { height: 70vh; } /* D28 */
-  .mula-3d-area { flex-direction: column; align-items: center; }
-  .mula-3d-sidebar {
-    width: 100%; flex-direction: row; overflow-x: auto; overflow-y: hidden;
-    max-height: none; gap: 0.5rem; padding: 0.5rem; justify-content: center;
-  }
+  /* SPEC-05 D32: phone keeps the desktop row: canvas left, texture column (50 px thumbs) right */
+  .mula-3d-sidebar { width: calc(50px + 1rem); padding: 0.5rem; gap: 0.5rem; }
   .mula-3d-sidebar .mula-3d-thumb { width: 50px; flex-shrink: 0; }
+  .mula-3d-wrapper > .mula-caption { padding-right: calc(50px + 1rem); } /* D33: column width, see above */
   .mula-task-bubble { width: 80vw; left: 10vw; padding: 0.75vh; align-content: center; } /* D20 */
   .mula-task-bubble .mula-btn-row:empty { display: none; } /* D20: no download button, no empty 2rem row */
   .mula-infobar { width: auto !important; }
