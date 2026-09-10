@@ -241,6 +241,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 }
 
 @media (max-width: 768px), (max-height: 500px) {
+  .mula-game-area { padding-left: 52px; } /* SPEC-17 D50: nothing sits under the green pill (50 px wide) on phones */
   /* SPEC-03: two images stay side by side on phone (D24); image cap 40vh -> 70vh (D23); captions stay (D25) */
   .mula-find-wrapper { overflow-y: auto; }
   .mula-find-column { max-width: 48%; }
