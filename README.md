@@ -4,7 +4,7 @@ A small, standalone JavaScript engine for building educational art games. Design
 
 One `<script>` tag, one `MulaEngine.init(...)` call, and you get a fully styled game with task bubble, mobile orientation hints, PDF materials viewer, and responsive scaling.
 
-**Current version:** 1.5.0
+**Current version:** 1.6.0
 
 ---
 
@@ -49,13 +49,16 @@ MMULA/
 ├── mula-engine.js        # The engine (one file, no dependencies except THREE for 3D)
 ├── mula-assets/          # Shared UI assets (Mula character, icons)
 │   ├── Mula_doma.png
+│   ├── MASKA.png
+│   ├── icon-check.svg
+│   ├── icon-chevron-right.svg
 │   ├── icon-close-menu.svg
-│   └── icon-chevron-right.svg
-├── games/                # Student games live here
+│   ├── icon-download.svg
+│   └── icon-refresh-1.svg
+├── demos/                # Demo games, one per game type (copy one to start your own)
 │   ├── demo-find-objects.html
 │   ├── demo-find2.html
 │   ├── demo-drag-objects.html
-│   ├── demo-3d-viewer.html
 │   ├── demo-3d-viewer-textures.html
 │   ├── demo-reveal-image.html
 │   ├── demo-hidden-objects.html
@@ -348,8 +351,28 @@ While laying out coordinates, add `debug: true` at the top level (or `alphaDebug
 ## Browser support
 
 - Modern browsers with CSS `mask-image` support (Chrome, Edge, Firefox, Safari). The `hidden-objects` spotlight uses radial-gradient masks.
-- Touch input is supported across all game types; mobile layout collapses sidebars to horizontal strips.
+- Touch input is supported across all game types. On phones (landscape) the piece list and the texture column stay beside the picture; every button is at least 44 px.
 - 3D viewer requires WebGL.
+
+---
+
+## Version history
+
+### 1.6.0 (2026-09)
+Layout and look fixes, no config or class-name change. Every existing game gets them from the CDN.
+- Every button is at least 44 px on phones: info bar, bubble close, PDF close, rotate hint, layer buttons, compare and preview buttons.
+- Task bubble on phones is compact and its text centred; it may cover the picture, the child closes it before playing.
+- The info bar grows out of the green arrow pill instead of the pill fading and the bar sliding in.
+- The original Mula icons are back: refresh, PDF materials (the download arrow), layer up, layer down, delete.
+- find-objects on phones: picture up to 70 % of the height, two pictures side by side. timed-preview picture 60 %.
+- drag-objects and the 3D viewer keep the desktop row on phones (picture left, list and buttons right); the compare button and the caption sit under the middle of the picture.
+- Small pictures are shown at their file size, never enlarged (this was already so; it is now the written rule).
+
+### 1.5.0 (2026-04-16)
+- Fixes ("Labojumi 1.5"); seven game types: find-objects, obj-viewer, drag-objects, reveal-image, hidden-objects, click-through, timed-preview.
+
+### 1.1 (2026-04-14)
+- First public commit: find-objects, obj-viewer, drag-objects.
 
 ---
 
