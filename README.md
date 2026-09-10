@@ -4,7 +4,7 @@ A small, standalone JavaScript engine for building educational art games. Design
 
 One `<script>` tag, one `MulaEngine.init(...)` call, and you get a fully styled game with task bubble, mobile orientation hints, PDF materials viewer, and responsive scaling.
 
-**Current version:** 1.6.0
+**Current version:** 1.7.0
 
 ---
 
@@ -140,6 +140,8 @@ MulaEngine.init('#game', {
   captionRight: 'Modificēts'
 });
 ```
+
+In two images mode there is **one counter** under both paintings, and the hotspots pair by position: `objectsLeft[0]` and `objectsRight[0]` are the same difference. Finding it on either painting marks it on both and counts once. Keep the two lists in the same order; an index that exists on one side only counts on its own. (If you styled `.mula-find-column .mula-find-footer` or read the second `.mula-find-footer-count`, note that in two images mode there is now one counter element and it sits in `.mula-find-wrapper`.)
 
 **Per-object options:**
 
@@ -357,6 +359,11 @@ While laying out coordinates, add `debug: true` at the top level (or `alphaDebug
 ---
 
 ## Version history
+
+### 1.7.0 (2026-09)
+find-objects with two paintings: one game, not two.
+- One counter under both paintings instead of one per painting.
+- A difference found on either painting is marked on both and counts once. Hotspots pair by their position in the two lists, so keep `objectsLeft` and `objectsRight` in the same order.
 
 ### 1.6.0 (2026-09)
 Layout and look fixes, no config or class-name change. Every existing game gets them from the CDN.
