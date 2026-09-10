@@ -4,7 +4,7 @@ A small, standalone JavaScript engine for building educational art games. Design
 
 One `<script>` tag, one `MulaEngine.init(...)` call, and you get a fully styled game with task bubble, mobile orientation hints, PDF materials viewer, and responsive scaling.
 
-**Current version:** 1.8.0
+**Current version:** 1.9.0
 
 ---
 
@@ -358,6 +358,12 @@ While laying out coordinates, add `debug: true` at the top level (or `alphaDebug
 ---
 
 ## Version history
+
+### 1.9.0 (2026-09)
+One HTML file is enough.
+- The Mula character and the icons come from GitHub unless your game sets `mulaAssetsPath`. The demos no longer set it, so a copied demo works in any folder next to your own pictures.
+- The rotate hint shows only on touch screens held upright, never in a PC window, and its "Turpināt tāpat" button now really hides it.
+- On small phones (iPhone SE) nothing sits under the green pill any more; the harness now checks that size too.
 
 ### 1.8.0 (2026-09)
 Hotspots follow the picture.
