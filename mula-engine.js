@@ -1,5 +1,5 @@
 /**
- * Mazā Mula Game Engine v1.8.0
+ * Mazā Mula Game Engine v1.9.0
  * Standalone JavaScript game engine for educational art games.
  * Supports 7 game types: find-objects, obj-viewer, drag-objects, reveal-image,
  * hidden-objects, click-through, timed-preview
@@ -17,6 +17,9 @@
     style.textContent = MULA_CSS;
     document.head.appendChild(style);
   }
+
+  // Where the engine's own pictures live when a game does not set mulaAssetsPath (SPEC-15, D47).
+  const MULA_ASSETS_CDN = 'https://cdn.jsdelivr.net/gh/Oskars-glitch/MMULA@main/mula-assets/';
 
   const MULA_CSS = `
 /* === MULA ENGINE BASE === */
@@ -238,6 +241,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 }
 
 @media (max-width: 768px), (max-height: 500px) {
+  .mula-game-area { padding-left: 52px; } /* SPEC-17 D50: nothing sits under the green pill (50 px wide) on phones */
   /* SPEC-03: two images stay side by side on phone (D24); image cap 40vh -> 70vh (D23); captions stay (D25) */
   .mula-find-wrapper { overflow-y: auto; }
   .mula-find-column { max-width: 48%; }
@@ -260,9 +264,10 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
   .mula-dragobj-canvas-wrap { max-height: 70vh; }
   .mula-dragobj-bg { max-height: 70vh; }
 }
-@media (orientation: portrait) and (max-width: 900px) {
+@media (orientation: portrait) and (max-width: 900px) and (pointer: coarse) { /* SPEC-16 D48: touch screens only */
   .mula-rotate-hint { display: flex !important; }
 }
+.mula-rotate-hint.dismissed { display: none !important; } /* SPEC-16 D51: the dismiss button must beat the rule above */
 .mula-rotate-hint {
   display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
   background: rgba(0,0,0,0.85); z-index: 99999; color: #fff;
@@ -305,7 +310,9 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
   // INFO BAR
   // ============================================================
   function createInfoBar(config) {
-    const mulaAssetsPath = config.mulaAssetsPath || 'mula-assets/';
+    // SPEC-15 (D47): Mula and the icons come from GitHub unless the game says where else they are,
+    // so a student needs one HTML file and their own pictures, nothing more.
+    const mulaAssetsPath = config.mulaAssetsPath || MULA_ASSETS_CDN;
     const mulaImgSrc = mulaAssetsPath + 'Mula_doma.png';
     const closeIconSrc = mulaAssetsPath + 'icon-close-menu.svg';
     const chevronSrc = mulaAssetsPath + 'icon-chevron-right.svg';
@@ -1447,6 +1454,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
         document.body.appendChild(hint);
         hint.querySelector('.mula-rotate-dismiss').addEventListener('click', function () {
           hint.style.display = 'none';
+          hint.classList.add('dismissed'); // SPEC-16 D51: inline none alone loses to the !important show rule
         });
         window.addEventListener('resize', function () {
           if (window.innerWidth > window.innerHeight) hint.style.display = 'none';
@@ -1484,7 +1492,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
       }
     },
 
-    version: '1.8.0'
+    version: '1.9.0'
   };
 
   // Export

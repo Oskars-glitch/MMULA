@@ -4,7 +4,7 @@ A small, standalone JavaScript engine for building educational art games. Design
 
 One `<script>` tag, one `MulaEngine.init(...)` call, and you get a fully styled game with task bubble, mobile orientation hints, PDF materials viewer, and responsive scaling.
 
-**Current version:** 1.8.0
+**Current version:** 1.9.0
 
 ---
 
@@ -30,7 +30,6 @@ One `<script>` tag, one `MulaEngine.init(...)` call, and you get a fully styled 
         { x: 80, y: 120, w: 130, h: 180 }
       ],
       taskText: 'Atrodi priekšmetus gleznā!',
-      mulaAssetsPath: '../mula-assets/',
       caption: 'Mana glezna'
     });
   </script>
@@ -38,7 +37,7 @@ One `<script>` tag, one `MulaEngine.init(...)` call, and you get a fully styled 
 </html>
 ```
 
-That's it. The engine injects its own CSS, builds the UI, and handles scaling, touch input, and mobile layout automatically.
+That's it: one HTML file next to your own pictures. The engine injects its own CSS, builds the UI, loads the Mula character and icons from GitHub, and handles scaling, touch input, and mobile layout automatically.
 
 ---
 
@@ -94,7 +93,7 @@ Paths in each HTML are written relative to that HTML file, so placing the engine
 | `taskText`        | string  | Task description shown in Mula's speech bubble. |
 | `caption`         | string  | Small caption below the image (e.g., artwork + author). |
 | `pdfUrl`          | string  | Optional PDF (methodical materials). Adds a 📄 button to the info bar. |
-| `mulaAssetsPath`  | string  | Path to `mula-assets/` relative to the HTML (default `'mula-assets/'`). |
+| `mulaAssetsPath`  | string  | Optional. Where the Mula character and icons are. Default: GitHub (`https://cdn.jsdelivr.net/gh/Oskars-glitch/MMULA@main/mula-assets/`), so you normally leave it out. Set it (for example `'../mula-assets/'`) only for an offline copy. |
 | `checkOrientation`| boolean | If `true` (default), shows a "rotate your device" hint in portrait on mobile. |
 
 ---
@@ -359,6 +358,12 @@ While laying out coordinates, add `debug: true` at the top level (or `alphaDebug
 ---
 
 ## Version history
+
+### 1.9.0 (2026-09)
+One HTML file is enough.
+- The Mula character and the icons come from GitHub unless your game sets `mulaAssetsPath`. The demos no longer set it, so a copied demo works in any folder next to your own pictures.
+- The rotate hint shows only on touch screens held upright, never in a PC window, and its "Turpināt tāpat" button now really hides it.
+- On small phones (iPhone SE) nothing sits under the green pill any more; the harness now checks that size too.
 
 ### 1.8.0 (2026-09)
 Hotspots follow the picture.
