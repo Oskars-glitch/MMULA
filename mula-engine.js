@@ -35,15 +35,18 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 }
 .mula-infobar-toggle img { width: 16px; height: 28px; }
 .mula-infobar-toggle:hover { background-color: rgba(76,175,80,0.85); }
-.mula-infobar-toggle.hidden { opacity: 0; pointer-events: none; }
+.mula-infobar-toggle.hidden { pointer-events: none; } /* D29: the pill stays visible; the growing bar covers it, so nothing fades before it is replaced */
 .mula-infobar {
-  position: fixed; left: -100%; bottom: 50px; z-index: 6000;
+  /* SPEC-02c D29: the bar sits at the pill's place and is revealed left to right, so the pill
+     grows into the bar. Above the pill (z 6002 > 6001) so it covers the arrow as it grows (D30). */
+  position: fixed; left: 0; bottom: 50px; z-index: 6002;
   height: 50px; border-radius: 0 100px 100px 0;
   background-color: #4CAF50; display: flex; align-items: center;
   justify-content: flex-end;
-  padding: 0 1.5rem; gap: 1rem; transition: left 0.5s ease;
+  padding: 0 1.5rem; gap: 1rem;
+  clip-path: inset(0 100% 0 0 round 0 100px 100px 0); transition: clip-path 0.5s ease;
 }
-.mula-infobar.opened { left: 0; }
+.mula-infobar.opened { clip-path: inset(0 0 0 0 round 0 100px 100px 0); }
 .mula-infobar button {
   background: none; border: none; cursor: pointer; width: 44px; height: 44px; /* D15: 44 px tap target, icon stays 28 px */
   background-repeat: no-repeat; background-size: 28px 28px; background-position: center;
