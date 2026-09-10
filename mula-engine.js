@@ -291,6 +291,16 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
     return e;
   }
 
+  // SPEC-13 (D45): call onSize whenever the picture changes size, whatever caused it.
+  // ResizeObserver watches the image itself; where a browser lacks it, window resize is the fallback.
+  function watchImageSize(img, onSize) {
+    if (typeof ResizeObserver === 'function') {
+      new ResizeObserver(function () { onSize(); }).observe(img);
+    } else {
+      window.addEventListener('resize', onSize);
+    }
+  }
+
   // ============================================================
   // INFO BAR
   // ============================================================
@@ -480,9 +490,6 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
     // Create click areas for each column
     columns.forEach(function (c, ci) {
       c.img.onload = function () {
-        var scaleX = c.img.clientWidth / iSize.width;
-        var scaleY = c.img.clientHeight / iSize.height;
-
         c.objs.forEach(function (obj, idx) {
           var area = el('div');
           var hasDebug = typeof obj.alphaDebug === 'number';
@@ -499,9 +506,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
           }
 
           area.style.cssText = 'position:absolute;cursor:pointer;border:' + initBorder + ';border-radius:4px;' +
-            'background:' + initBg + ';' +
-            'left:' + (obj.x * scaleX) + 'px;top:' + (obj.y * scaleY) + 'px;' +
-            'width:' + (obj.w * scaleX) + 'px;height:' + (obj.h * scaleY) + 'px;';
+            'background:' + initBg + ';';
           area.dataset.idx = idx;
           areasByColumn[ci][idx] = { area: area, obj: obj };
           if (foundPairs.has(idx)) markFound(area, obj); // the other side was found before this image loaded
@@ -515,8 +520,25 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
           });
           c.imgContainer.appendChild(area);
         });
+        placeAreas(ci);
       };
+      watchImageSize(c.img, function () { placeAreas(ci); }); // SPEC-13
     });
+
+    // SPEC-13 (D43): hotspot boxes come from the picture's current size, at load and whenever
+    // it changes. The elements stay, so found marks stay.
+    function placeAreas(ci) {
+      var img = columns[ci].img;
+      var scaleX = img.clientWidth / iSize.width;
+      var scaleY = img.clientHeight / iSize.height;
+      areasByColumn[ci].forEach(function (a) {
+        if (!a) return;
+        a.area.style.left = (a.obj.x * scaleX) + 'px';
+        a.area.style.top = (a.obj.y * scaleY) + 'px';
+        a.area.style.width = (a.obj.w * scaleX) + 'px';
+        a.area.style.height = (a.obj.h * scaleY) + 'px';
+      });
+    }
   }
 
   // ============================================================
@@ -798,13 +820,34 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 
     bgImg.onload = function () { setupPieces(); };
 
+    // How much the bg image is scaled to fit the container, read at the moment it is needed
+    // (SPEC-13: the painting can change size after load).
+    function currentBgScale() {
+      return Math.min(bgImg.clientWidth / bgImg.naturalWidth, bgImg.clientHeight / bgImg.naturalHeight);
+    }
+
+    // SPEC-13 (D44): dropped pieces keep their place and relative size on the painting when it
+    // changes size. Positions are px inside the canvas wrap, so the painting's offset is part of it.
+    var lastBg = null;
+    function bgMetrics() {
+      return { left: bgImg.offsetLeft, top: bgImg.offsetTop, w: bgImg.clientWidth, h: bgImg.clientHeight };
+    }
+    function rescalePieces() {
+      var now = bgMetrics();
+      if (!lastBg || !lastBg.w || !lastBg.h || !now.w || !now.h) { lastBg = now; return; }
+      placedPieces.forEach(function (piece) {
+        var l = parseFloat(piece.style.left) || 0, t = parseFloat(piece.style.top) || 0;
+        var w = parseFloat(piece.style.width) || 0, h = parseFloat(piece.style.height) || 0;
+        piece.style.left = (now.left + (l - lastBg.left) / lastBg.w * now.w) + 'px';
+        piece.style.top = (now.top + (t - lastBg.top) / lastBg.h * now.h) + 'px';
+        piece.style.width = (w / lastBg.w * now.w) + 'px';
+        piece.style.height = (h / lastBg.h * now.h) + 'px';
+      });
+      lastBg = now;
+    }
+    watchImageSize(bgImg, rescalePieces);
+
     function setupPieces() {
-      // Calculate the scale factor: how much the bg image was scaled to fit the container
-      var bgNatW = bgImg.naturalWidth;
-      var bgNatH = bgImg.naturalHeight;
-      var bgDispW = bgImg.clientWidth;
-      var bgDispH = bgImg.clientHeight;
-      var bgScale = Math.min(bgDispW / bgNatW, bgDispH / bgNatH);
 
       objects.forEach(function (obj) {
         var thumb = el('img', { class: 'mula-dragobj-thumb', src: obj.src, draggable: 'false' });
@@ -819,7 +862,8 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
           // Preload to get natural dimensions
           var tempImg = new Image();
           tempImg.onload = function () {
-            // Scale the piece proportionally to the background image scaling
+            // Scale the piece proportionally to the background image scaling (current, SPEC-13)
+            var bgScale = currentBgScale();
             var w = tempImg.naturalWidth * bgScale;
             var h = tempImg.naturalHeight * bgScale;
 
@@ -976,7 +1020,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
       bgImg.onload = buildSpots;
     }
 
-    window.addEventListener('resize', layoutSpots);
+    watchImageSize(bgImg, layoutSpots); // SPEC-13 (D45): the picture itself is watched
   }
 
   // ============================================================
@@ -1121,7 +1165,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
     if (bgImg.complete && bgImg.naturalWidth) init();
     else bgImg.onload = init;
 
-    window.addEventListener('resize', layoutSpots);
+    watchImageSize(bgImg, layoutSpots); // SPEC-13 (D45): the picture itself is watched
   }
 
   // ============================================================
@@ -1198,7 +1242,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
     if (bgImg.complete && bgImg.naturalWidth) buildSpots();
     else bgImg.onload = buildSpots;
 
-    window.addEventListener('resize', layoutSpots);
+    watchImageSize(bgImg, layoutSpots); // SPEC-13 (D45): the picture itself is watched
   }
 
   // ============================================================
@@ -1272,10 +1316,8 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
     var foundSet = new Set();
     var foundCount = 0;
 
+    var timedAreas = [];
     mainImg.onload = function () {
-      var scaleX = mainImg.clientWidth / iSize.width;
-      var scaleY = mainImg.clientHeight / iSize.height;
-
       objs.forEach(function (obj, idx) {
         var area = el('div');
         var hasDebug = debug || typeof obj.alphaDebug === 'number';
@@ -1292,9 +1334,8 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
         }
 
         area.style.cssText = 'position:absolute;cursor:pointer;border:' + initBorder + ';border-radius:4px;' +
-          'background:' + initBg + ';' +
-          'left:' + (obj.x * scaleX) + 'px;top:' + (obj.y * scaleY) + 'px;' +
-          'width:' + (obj.w * scaleX) + 'px;height:' + (obj.h * scaleY) + 'px;';
+          'background:' + initBg + ';';
+        timedAreas.push({ area: area, obj: obj });
 
         area.addEventListener('click', function () {
           if (foundSet.has(idx)) return;
@@ -1312,7 +1353,21 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
         });
         imgContainer.appendChild(area);
       });
+      placeTimedAreas();
     };
+    watchImageSize(mainImg, placeTimedAreas); // SPEC-13
+
+    // SPEC-13 (D43): same as find-objects, boxes follow the picture, elements stay.
+    function placeTimedAreas() {
+      var scaleX = mainImg.clientWidth / iSize.width;
+      var scaleY = mainImg.clientHeight / iSize.height;
+      timedAreas.forEach(function (a) {
+        a.area.style.left = (a.obj.x * scaleX) + 'px';
+        a.area.style.top = (a.obj.y * scaleY) + 'px';
+        a.area.style.width = (a.obj.w * scaleX) + 'px';
+        a.area.style.height = (a.obj.h * scaleY) + 'px';
+      });
+    }
 
     // Preview overlay logic
     var previewsUsed = 0;
