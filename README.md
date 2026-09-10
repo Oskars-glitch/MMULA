@@ -4,7 +4,7 @@ A small, standalone JavaScript engine for building educational art games. Design
 
 One `<script>` tag, one `MulaEngine.init(...)` call, and you get a fully styled game with task bubble, mobile orientation hints, PDF materials viewer, and responsive scaling.
 
-**Current version:** 1.7.0
+**Current version:** 1.8.0
 
 ---
 
@@ -359,6 +359,11 @@ While laying out coordinates, add `debug: true` at the top level (or `alphaDebug
 ---
 
 ## Version history
+
+### 1.8.0 (2026-09)
+Hotspots follow the picture.
+- When the picture changes size (turning the phone after the rotate hint, resizing the window), every hotspot and every dropped drag piece moves and scales with it, in all six picture games.
+- What was already found stays found; the counter does not change.
 
 ### 1.7.0 (2026-09)
 find-objects with two paintings: one game, not two.
