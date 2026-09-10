@@ -141,6 +141,8 @@ MulaEngine.init('#game', {
 });
 ```
 
+In two images mode there is **one counter** under both paintings, and the hotspots pair by position: `objectsLeft[0]` and `objectsRight[0]` are the same difference. Finding it on either painting marks it on both and counts once. Keep the two lists in the same order; an index that exists on one side only counts on its own. (If you styled `.mula-find-column .mula-find-footer` or read the second `.mula-find-footer-count`, note that in two images mode there is now one counter element and it sits in `.mula-find-wrapper`.)
+
 **Per-object options:**
 
 | Option       | Default | Description |

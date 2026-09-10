@@ -89,7 +89,8 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 @keyframes mulaScaleIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
 /* === FIND OBJECTS GAME === */
-.mula-find-wrapper { flex: 1; display: flex; flex-direction: row; align-items: flex-end; justify-content: center; gap: 1.5vh; padding: 1vh; }
+.mula-find-wrapper { flex: 1; display: flex; flex-direction: row; flex-wrap: wrap; align-items: flex-end; justify-content: center; gap: 1.5vh; padding: 1vh; }
+.mula-find-wrapper > .mula-find-footer { flex-basis: 100%; } /* SPEC-11 D39: one counter under both paintings */
 .mula-find-wrapper.single { align-items: center; }
 .mula-find-column { display: flex; flex-direction: column; align-items: center; max-width: 48%; }
 .mula-find-column.single { max-width: 90%; }
@@ -434,15 +435,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
       if (caption) {
         col.appendChild(el('div', { class: 'mula-caption' }, caption));
       }
-      var footer = el('div', { class: 'mula-find-footer' });
-      var label = el('span', { class: 'mula-find-footer-label' }, 'Atrast');
-      var count = el('span', { class: 'mula-find-footer-count' }, '0');
-      count.style.background = color;
-      footer.appendChild(label);
-      footer.appendChild(count);
-      col.appendChild(footer);
-
-      return { col: col, imgContainer: imgContainer, img: img, count: count, objs: objs };
+      return { col: col, imgContainer: imgContainer, img: img, objs: objs };
     }
 
     var columns = [];
@@ -458,13 +451,34 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
     }
 
     columns.forEach(function (c) { wrapper.appendChild(c.col); });
+
+    // One counter. Single image: inside the column as before. Two images: under both
+    // paintings, centred (SPEC-11, D39).
+    var footer = el('div', { class: 'mula-find-footer' });
+    footer.appendChild(el('span', { class: 'mula-find-footer-label' }, 'Atrast'));
+    var count = el('span', { class: 'mula-find-footer-count' }, '0');
+    count.style.background = color;
+    footer.appendChild(count);
+    if (isSingle) columns[0].col.appendChild(footer); else wrapper.appendChild(footer);
     container.appendChild(wrapper);
 
-    // Create click areas for each column
-    columns.forEach(function (c) {
-      var foundSet = new Set();
-      var foundCount = 0;
+    // Shared state (SPEC-11, D37): hotspot i on the left pairs with hotspot i on the right.
+    // Finding either side marks both and counts once. An index that exists on one side only
+    // counts alone. In single-image mode this is the old behaviour.
+    var foundPairs = new Set();
+    var foundCount = 0;
+    var areasByColumn = columns.map(function () { return []; });
 
+    function markFound(area, obj) {
+      var objFill = typeof obj.fill === 'number' ? obj.fill : 1; // default 1 (filled)
+      var a = typeof obj.alpha === 'number' ? obj.alpha / 100 : 0.2;
+      area.style.borderColor = color;
+      area.style.borderStyle = 'solid';
+      area.style.background = objFill ? 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + a + ')' : 'transparent';
+    }
+
+    // Create click areas for each column
+    columns.forEach(function (c, ci) {
       c.img.onload = function () {
         var scaleX = c.img.clientWidth / iSize.width;
         var scaleY = c.img.clientHeight / iSize.height;
@@ -472,7 +486,6 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
         c.objs.forEach(function (obj, idx) {
           var area = el('div');
           var hasDebug = typeof obj.alphaDebug === 'number';
-          var objFill = typeof obj.fill === 'number' ? obj.fill : 1; // default 1 (filled)
 
           // Initial style: if alphaDebug is set, show the area visibly
           var initBorder, initBg;
@@ -490,21 +503,15 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
             'left:' + (obj.x * scaleX) + 'px;top:' + (obj.y * scaleY) + 'px;' +
             'width:' + (obj.w * scaleX) + 'px;height:' + (obj.h * scaleY) + 'px;';
           area.dataset.idx = idx;
+          areasByColumn[ci][idx] = { area: area, obj: obj };
+          if (foundPairs.has(idx)) markFound(area, obj); // the other side was found before this image loaded
 
           area.addEventListener('click', function () {
-            if (foundSet.has(idx)) return;
-            foundSet.add(idx);
+            if (foundPairs.has(idx)) return;
+            foundPairs.add(idx);
             foundCount++;
-            c.count.textContent = foundCount;
-            // Highlight: show border, fill only if fill !== 0
-            var a = typeof obj.alpha === 'number' ? obj.alpha / 100 : 0.2;
-            area.style.borderColor = color;
-            area.style.borderStyle = 'solid';
-            if (objFill) {
-              area.style.background = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + a + ')';
-            } else {
-              area.style.background = 'transparent';
-            }
+            count.textContent = foundCount;
+            areasByColumn.forEach(function (list) { if (list[idx]) markFound(list[idx].area, list[idx].obj); });
           });
           c.imgContainer.appendChild(area);
         });
