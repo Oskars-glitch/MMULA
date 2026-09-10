@@ -18,6 +18,9 @@
     document.head.appendChild(style);
   }
 
+  // Where the engine's own pictures live when a game does not set mulaAssetsPath (SPEC-15, D47).
+  const MULA_ASSETS_CDN = 'https://cdn.jsdelivr.net/gh/Oskars-glitch/MMULA@main/mula-assets/';
+
   const MULA_CSS = `
 /* === MULA ENGINE BASE === */
 * { box-sizing: border-box; }
@@ -305,7 +308,9 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
   // INFO BAR
   // ============================================================
   function createInfoBar(config) {
-    const mulaAssetsPath = config.mulaAssetsPath || 'mula-assets/';
+    // SPEC-15 (D47): Mula and the icons come from GitHub unless the game says where else they are,
+    // so a student needs one HTML file and their own pictures, nothing more.
+    const mulaAssetsPath = config.mulaAssetsPath || MULA_ASSETS_CDN;
     const mulaImgSrc = mulaAssetsPath + 'Mula_doma.png';
     const closeIconSrc = mulaAssetsPath + 'icon-close-menu.svg';
     const chevronSrc = mulaAssetsPath + 'icon-chevron-right.svg';
