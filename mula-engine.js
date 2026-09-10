@@ -263,9 +263,10 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
   .mula-dragobj-canvas-wrap { max-height: 70vh; }
   .mula-dragobj-bg { max-height: 70vh; }
 }
-@media (orientation: portrait) and (max-width: 900px) {
+@media (orientation: portrait) and (max-width: 900px) and (pointer: coarse) { /* SPEC-16 D48: touch screens only */
   .mula-rotate-hint { display: flex !important; }
 }
+.mula-rotate-hint.dismissed { display: none !important; } /* SPEC-16 D51: the dismiss button must beat the rule above */
 .mula-rotate-hint {
   display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
   background: rgba(0,0,0,0.85); z-index: 99999; color: #fff;
@@ -1452,6 +1453,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
         document.body.appendChild(hint);
         hint.querySelector('.mula-rotate-dismiss').addEventListener('click', function () {
           hint.style.display = 'none';
+          hint.classList.add('dismissed'); // SPEC-16 D51: inline none alone loses to the !important show rule
         });
         window.addEventListener('resize', function () {
           if (window.innerWidth > window.innerHeight) hint.style.display = 'none';
