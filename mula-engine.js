@@ -1,5 +1,5 @@
 /**
- * Mazā Mula Game Engine v1.6.0
+ * Mazā Mula Game Engine v1.7.0
  * Standalone JavaScript game engine for educational art games.
  * Supports 7 game types: find-objects, obj-viewer, drag-objects, reveal-image,
  * hidden-objects, click-through, timed-preview
@@ -1429,7 +1429,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
       }
     },
 
-    version: '1.6.0'
+    version: '1.7.0'
   };
 
   // Export
