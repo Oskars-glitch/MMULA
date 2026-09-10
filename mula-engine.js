@@ -1,7 +1,8 @@
 /**
- * Mazā Mula Game Engine v1.1
+ * Mazā Mula Game Engine v1.6.0
  * Standalone JavaScript game engine for educational art games.
- * Supports 3 game types: find-objects, obj-viewer, drag-objects
+ * Supports 7 game types: find-objects, obj-viewer, drag-objects, reveal-image,
+ * hidden-objects, click-through, timed-preview
  */
 (function (root) {
   'use strict';
@@ -35,26 +36,31 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 }
 .mula-infobar-toggle img { width: 16px; height: 28px; }
 .mula-infobar-toggle:hover { background-color: rgba(76,175,80,0.85); }
-.mula-infobar-toggle.hidden { opacity: 0; pointer-events: none; }
+.mula-infobar-toggle.hidden { pointer-events: none; } /* D29: the pill stays visible; the growing bar covers it, so nothing fades before it is replaced */
 .mula-infobar {
-  position: fixed; left: -100%; bottom: 50px; z-index: 6000;
+  /* SPEC-02c D29: the bar sits at the pill's place and is revealed left to right, so the pill
+     grows into the bar. Above the pill (z 6002 > 6001) so it covers the arrow as it grows (D30). */
+  position: fixed; left: 0; bottom: 50px; z-index: 6002;
   height: 50px; border-radius: 0 100px 100px 0;
   background-color: #4CAF50; display: flex; align-items: center;
   justify-content: flex-end;
-  padding: 0 1.5rem; gap: 1rem; transition: left 0.5s ease;
+  padding: 0 1.5rem; gap: 1rem;
+  clip-path: inset(0 100% 0 0 round 0 100px 100px 0); transition: clip-path 0.5s ease;
 }
-.mula-infobar.opened { left: 0; }
+.mula-infobar.opened { clip-path: inset(0 0 0 0 round 0 100px 100px 0); }
 .mula-infobar button {
-  background: none; border: none; cursor: pointer; width: 40px; height: 40px;
+  background: none; border: none; cursor: pointer; width: 44px; height: 44px; /* D15: 44 px tap target, icon stays 28 px */
   background-repeat: no-repeat; background-size: 28px 28px; background-position: center;
   opacity: 0.9; padding: 0;
 }
 .mula-infobar button:hover { opacity: 1; }
 .mula-infobar .mula-btn-refresh {
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>');
+  /* original icon-refresh-1.svg (D21): white disc, red arrow (D22) */
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 54"><circle cx="27" cy="27" r="27" fill="%23ffffff"/><g transform="translate(11,11.5)" fill="none" stroke="%23e6381b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 29,16 C 29,22 24,29 16,29 8,29 3,22 3,16 3,10 8,3 16,3 c 5,0 9,3 11,6 m -7,1 7,-1 1,-7"/></g></svg>');
 }
 .mula-infobar .mula-btn-pdf {
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="8" r="5"/><path d="M3 21c0-4.97 4.03-9 9-9s9 4.03 9 9"/><path d="M12 11v4"/><path d="M10 6c0 0 .5-2 2-2s2 2 2 2"/><path d="M8.5 9.5l-1.5 1"/><path d="M15.5 9.5l1.5 1"/></svg>');
+  /* original icon-download.svg (D21), white on green (D22) */
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"><path d="M28 22 L28 30 4 30 4 22 M16 4 L16 24 M8 16 L16 24 24 16"/></svg>');
 }
 .mula-task-bubble {
   position: fixed; z-index: 5998; left: 3vw; bottom: 83px;
@@ -69,10 +75,11 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
   position: absolute; left: 0; top: -17.5vh; height: 20vh; width: auto;
 }
 .mula-task-bubble .mula-close-btn {
-  position: absolute; top: -1.5vh; right: -20px; width: 36px; height: 36px;
+  position: absolute; top: -1.5vh; right: -20px; width: 44px; height: 44px; /* D15: 44 px tap target, icon stays 36 px */
   border: none; cursor: pointer; padding: 0; background: none;
+  display: flex; align-items: center; justify-content: center;
 }
-.mula-task-bubble .mula-close-btn img { width: 100%; height: 100%; display: block; }
+.mula-task-bubble .mula-close-btn img { width: 36px; height: 36px; display: block; }
 .mula-task-bubble .mula-btn-row { display: flex; justify-content: center; gap: 1rem; margin-left: auto; min-width: 1px; height: 2rem; }
 .mula-task-bubble .mula-btn-download {
   background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23999"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>') no-repeat left center;
@@ -112,6 +119,9 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 }
 .mula-3d-sidebar .mula-3d-thumb:hover { border-color: #e6381b; }
 .mula-3d-sidebar .mula-3d-thumb.active { border-color: #2196F3; }
+/* SPEC-05 D33: the caption shares the canvas axis; the row above also holds the 14vh texture column,
+   so the same width is taken off the right. If the column width changes, this number must follow. */
+.mula-3d-wrapper > .mula-caption { padding-left: 0; padding-right: 14vh; }
 
 /* === DRAG OBJECTS GAME === */
 .mula-dragobj-wrapper { flex: 1; display: flex; flex-direction: column; }
@@ -122,7 +132,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 .mula-dragobj-piece img { width: 100%; height: 100%; pointer-events: none; display: block; }
 .mula-dragobj-piece.selected { outline: 2px solid #2196F3; outline-offset: 4px; }
 .mula-layer-panel { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem; background: #4CAF50; border-radius: 8px; align-self: flex-start; margin-top: 1rem; }
-.mula-layer-btn { width: 40px; height: 40px; background: transparent; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.mula-layer-btn { width: 44px; height: 44px; /* D15: 44 px tap target */ background: transparent; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .mula-layer-btn:hover { background: rgba(255,255,255,0.2); }
 .mula-layer-btn svg { width: 24px; height: 24px; }
 .mula-dragobj-sidebar {
@@ -138,8 +148,12 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 .mula-dragobj-sidebar .mula-dragobj-thumb:hover { border-color: #e6381b; }
 .mula-dragobj-compare { flex: 1; display: flex; flex-direction: row; gap: 1.5vh; padding: 1vh; justify-content: center; align-items: center; }
 .mula-dragobj-compare .mula-compare-img { flex: 1; max-width: 90vw; height: 80vh; background-size: contain; background-repeat: no-repeat; background-position: center center; }
-.mula-dragobj-buttons { text-align: center; padding: 0.5rem; }
-.mula-dragobj-buttons button { padding: 0.5rem 1.5rem; background: #e6381b; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
+/* SPEC-04 D27: button row, caption and compare view share the painting's axis. The row that holds the
+   painting also holds the layer panel (44 px + 2 x 0.5rem = 60 px) and the piece list (14vh), so the
+   same width is taken off the right. If the list or panel width changes, this number must follow. */
+.mula-dragobj-buttons, .mula-dragobj-wrapper > .mula-caption, .mula-dragobj-compare { padding-left: 0; padding-right: calc(14vh + 60px); }
+.mula-dragobj-buttons { text-align: center; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.mula-dragobj-buttons button { padding: 0.5rem 1.5rem; min-height: 44px; /* D15 */ background: #e6381b; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
 .mula-dragobj-buttons button:hover { background: #c42f17; }
 
 /* === RESPONSIVE / MOBILE === */
@@ -187,7 +201,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 .mula-timed-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1vh; }
 .mula-timed-toolbar { display: flex; justify-content: center; padding: 0.5rem 0; }
 .mula-timed-btn {
-  padding: 0.5rem 1.5rem; background: #e6381b; color: #fff; border: none;
+  padding: 0.5rem 1.5rem; min-height: 44px; /* D15: 44 px tap target */ background: #e6381b; color: #fff; border: none;
   border-radius: 4px; cursor: pointer; font-size: 0.95rem; font-weight: 600;
 }
 .mula-timed-btn:hover { background: #c42f17; }
@@ -212,7 +226,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 }
 .mula-pdf-close {
   position: fixed; top: 12px; right: 12px; z-index: 10001;
-  width: 32px; height: 32px; border: none; cursor: pointer;
+  width: 44px; height: 44px; /* D15: 44 px tap target, icon stays 18 px */ border: none; cursor: pointer;
   background: rgba(0,0,0,0.08); border-radius: 50%; opacity: 0.7;
   display: flex; align-items: center; justify-content: center;
 }
@@ -223,26 +237,27 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 }
 
 @media (max-width: 768px), (max-height: 500px) {
-  .mula-find-wrapper { flex-direction: column; align-items: center; overflow-y: auto; }
-  .mula-find-column { max-width: 95%; }
-  .mula-find-column img { max-width: 90vw !important; max-height: 40vh !important; }
-  .mula-dragobj-area { flex-direction: column; align-items: center; }
-  .mula-dragobj-sidebar {
-    width: 100%; flex-direction: row; overflow-x: auto; overflow-y: hidden;
-    gap: 0.5rem; padding: 0.5rem; padding-left: 60px; justify-content: center;
-  }
+  /* SPEC-03: two images stay side by side on phone (D24); image cap 40vh -> 70vh (D23); captions stay (D25) */
+  .mula-find-wrapper { overflow-y: auto; }
+  .mula-find-column { max-width: 48%; }
+  .mula-find-column.single { max-width: 95%; }
+  .mula-find-column img { max-width: 45vw !important; max-height: 70vh !important; }
+  .mula-find-column.single img { max-width: 90vw !important; }
+  .mula-timed-wrapper .mula-find-column img { max-height: 60vh !important; } /* D26: preview button above needs the room */
+  /* SPEC-04 D27: phone keeps the desktop row: painting left, piece list (50 px thumbs) and layer panel right */
+  .mula-dragobj-sidebar { width: calc(50px + 1rem); max-height: 70vh; padding: 0.5rem; gap: 0.5rem; }
   .mula-dragobj-sidebar .mula-dragobj-thumb { width: 50px; flex-shrink: 0; }
-  .mula-3d-area { flex-direction: column; align-items: center; }
-  .mula-3d-sidebar {
-    width: 100%; flex-direction: row; overflow-x: auto; overflow-y: hidden;
-    max-height: none; gap: 0.5rem; padding: 0.5rem; justify-content: center;
-  }
+  .mula-dragobj-buttons, .mula-dragobj-wrapper > .mula-caption, .mula-dragobj-compare { padding-right: calc(50px + 1rem + 60px); } /* list + panel, see above */
+  .mula-dragobj-compare .mula-compare-img { height: 70vh; } /* D28 */
+  /* SPEC-05 D32: phone keeps the desktop row: canvas left, texture column (50 px thumbs) right */
+  .mula-3d-sidebar { width: calc(50px + 1rem); padding: 0.5rem; gap: 0.5rem; }
   .mula-3d-sidebar .mula-3d-thumb { width: 50px; flex-shrink: 0; }
-  .mula-task-bubble { width: 80vw; left: 10vw; }
+  .mula-3d-wrapper > .mula-caption { padding-right: calc(50px + 1rem); } /* D33: column width, see above */
+  .mula-task-bubble { width: 80vw; left: 10vw; padding: 0.75vh; align-content: center; } /* D20 */
+  .mula-task-bubble .mula-btn-row:empty { display: none; } /* D20: no download button, no empty 2rem row */
   .mula-infobar { width: auto !important; }
-  .mula-layer-panel { flex-direction: row; align-self: center; margin-top: 0; order: 10; }
-  .mula-dragobj-canvas-wrap { max-height: 70vh; width: 100%; }
-  .mula-dragobj-bg { max-height: 70vh; max-width: 95vw; }
+  .mula-dragobj-canvas-wrap { max-height: 70vh; }
+  .mula-dragobj-bg { max-height: 70vh; }
 }
 @media (orientation: portrait) and (max-width: 900px) {
   .mula-rotate-hint { display: flex !important; }
@@ -254,7 +269,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
   font-size: 1.3rem; text-align: center; padding: 2rem;
 }
 .mula-rotate-hint .mula-rotate-icon { font-size: 4rem; margin-bottom: 1rem; }
-.mula-rotate-hint .mula-rotate-dismiss { margin-top: 1.5rem; padding: 0.5rem 1.5rem; background: #e6381b; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
+.mula-rotate-hint .mula-rotate-dismiss { margin-top: 1.5rem; padding: 0.5rem 1.5rem; min-height: 44px; /* D15 */ background: #e6381b; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
 `;
 
   // ============================================================
@@ -688,11 +703,11 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
     // Layer controls panel (right side, green with white SVG icons)
     const layerPanel = el('div', { class: 'mula-layer-panel' });
     var btnUp = el('button', { class: 'mula-layer-btn', title: 'Uz augšu' });
-    btnUp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="6" y1="5" x2="18" y2="5"/><polyline points="8 9 12 5 16 9"/></svg>';
+    btnUp.innerHTML = '<svg viewBox="0 0 24 24" fill="white"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>'; // original arrow_upward-24px.svg (D21, D22)
     var btnDown = el('button', { class: 'mula-layer-btn', title: 'Uz leju' });
-    btnDown.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="6" y1="19" x2="18" y2="19"/><polyline points="8 15 12 19 16 15"/></svg>';
+    btnDown.innerHTML = '<svg viewBox="0 0 24 24" fill="white"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>'; // original arrow_downward-24px.svg (D21, D22)
     var btnDel = el('button', { class: 'mula-layer-btn', title: 'Dzēst' });
-    btnDel.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>';
+    btnDel.innerHTML = '<svg viewBox="0 0 32 32" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"><path d="M30 18 L16 5 2 18Z M2 25 L30 25"/></svg>'; // original icon-eject.svg (D21, D22)
     layerPanel.appendChild(btnUp);
     layerPanel.appendChild(btnDown);
     layerPanel.appendChild(btnDel);
@@ -1407,7 +1422,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
       }
     },
 
-    version: '1.5.0'
+    version: '1.6.0'
   };
 
   // Export
