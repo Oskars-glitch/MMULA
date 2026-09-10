@@ -200,7 +200,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4edd
 .mula-timed-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1vh; }
 .mula-timed-toolbar { display: flex; justify-content: center; padding: 0.5rem 0; }
 .mula-timed-btn {
-  padding: 0.5rem 1.5rem; background: #e6381b; color: #fff; border: none;
+  padding: 0.5rem 1.5rem; min-height: 44px; /* D15: 44 px tap target */ background: #e6381b; color: #fff; border: none;
   border-radius: 4px; cursor: pointer; font-size: 0.95rem; font-weight: 600;
 }
 .mula-timed-btn:hover { background: #c42f17; }
